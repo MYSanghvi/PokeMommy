@@ -1,4 +1,4 @@
-# Tiny Trainer PokéQuiz ⚡
+# Pokemon Quiz - Trainer In Training ⚡
 
 A small Pokémon quiz where you guess the Pokémon from its image or silhouette.
 

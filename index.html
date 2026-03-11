@@ -401,6 +401,14 @@
     .learn-nav-btn:hover:not(:disabled) { border-color: #cc0000; color: #cc0000; background: #fff0f0; }
     .learn-nav-btn:disabled { opacity: .35; cursor: default; }
 
+    /* ── SWIPE HINT ── */
+    .swipe-hint {
+      text-align: center; font-family: 'PressStart2P', cursive; font-size: 8px;
+      color: #bbb; margin-bottom: 14px; letter-spacing: 1px;
+      transition: opacity .4s ease;
+    }
+    .swipe-hint.hidden { opacity: 0; pointer-events: none; }
+
     /* ── FOOTER ── */
     .page-footer {
       max-width: 520px; width: 100%; margin-top: 20px;
@@ -582,6 +590,7 @@
       <button class="learn-nav-btn" id="learn-nav-prev" onclick="learnNavigate(-1)">‹ Prev</button>
       <button class="learn-nav-btn" id="learn-nav-next" onclick="learnNavigate(1)">Next ›</button>
     </div>
+    <div class="swipe-hint" id="swipe-hint">‹ swipe to navigate ›</div>
     <div class="learn-sprite-wrap">
       <div class="spinner" id="learn-spinner"></div>
       <img id="learn-sprite" src="" alt=""/>
@@ -621,6 +630,14 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
+// PRELOADED AUDIO
+// ═══════════════════════════════════════════════════════════════════
+const clickAudio = new Audio('sounds/interaction.mp3');
+clickAudio.preload = 'auto';
+const whosThatAudio = new Audio('sounds/whos-that-pokemon.mp3');
+whosThatAudio.preload = 'auto';
+
+// ═══════════════════════════════════════════════════════════════════
 // AUDIO — SFX
 // ═══════════════════════════════════════════════════════════════════
 let audioCtx = null, soundOn = true;
@@ -646,8 +663,8 @@ function playFanfare() { [523,659,784,1047].forEach((f,i)=>tone(f,'square',0.2,0
 function playHint()    { tone(880,'sine',0.09,0.15,0); }
 function playClick() {
   if (!soundOn) return;
-  const a=new Audio('sounds/interaction.mp3');
-  a.play().catch(()=>{});
+  clickAudio.currentTime = 0;
+  clickAudio.play().catch(()=>{});
 }
 function toggleSound() {
   soundOn=!soundOn;
@@ -740,13 +757,47 @@ let hintsRevealed=0, currentPokemonData=null;
 const QUICK_COUNT=20;
 
 // ═══════════════════════════════════════════════════════════════════
+// SWIPE — Pokédex detail
+// ═══════════════════════════════════════════════════════════════════
+let touchStartX=0, touchStartY=0, swipeCount=0;
+const MAX_SWIPE_HINTS=3;
+
+document.getElementById('learn-detail-screen').addEventListener('touchstart', e=>{
+  touchStartX=e.changedTouches[0].screenX;
+  touchStartY=e.changedTouches[0].screenY;
+},{ passive:true });
+
+document.getElementById('learn-detail-screen').addEventListener('touchend', e=>{
+  const dx=e.changedTouches[0].screenX - touchStartX;
+  const dy=e.changedTouches[0].screenY - touchStartY;
+  if (Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) {
+    if (dx<0) learnNavigate(1);
+    else      learnNavigate(-1);
+    // count swipes and hide hint after 3
+    swipeCount++;
+    if (swipeCount>=MAX_SWIPE_HINTS) {
+      const hint=document.getElementById('swipe-hint');
+      if (hint) hint.classList.add('hidden');
+    }
+  }
+},{ passive:true });
+
+// Hide swipe hint on non-touch devices immediately
+window.addEventListener('load', ()=>{
+  if (!('ontouchstart' in window)) {
+    const hint=document.getElementById('swipe-hint');
+    if (hint) hint.classList.add('hidden');
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════════
 function goToWelcome(type) {
   playClick();
   if (type==='whos' && soundOn) {
-    const a=new Audio('sounds/whos-that-pokemon.mp3');
-    a.play().catch(()=>{});
+    whosThatAudio.currentTime=0;
+    whosThatAudio.play().catch(()=>{});
   }
   quizType=type; difficulty=null; quizMode='quick';
   document.getElementById('btn-easy').classList.remove('selected');
@@ -912,12 +963,16 @@ async function renderQuestion() {
     renderEvoQuestion(q.evoQ);
   }
 }
+
 function renderWhosQuestion(q) {
   const img=document.getElementById('pokemon-img'), spn=document.getElementById('spinner');
   document.getElementById('options-grid').innerHTML='';
   img.style.opacity='0'; spn.style.display='block';
-  img.className=difficulty==='hard'?'silhouette':'';
-  img.onload =()=>{ spn.style.display='none'; img.style.opacity='1'; preloadNext(); };
+  img.className=''; img.src='';
+  img.onload=()=>{
+    if (difficulty==='hard') img.classList.add('silhouette');
+    spn.style.display='none'; img.style.opacity='1'; preloadNext();
+  };
   img.onerror=()=>{ img.onerror=null; img.src=fallbackUrl(q.correct.id); };
   img.src=gifUrl(q.correct.name);
   q.options.forEach(opt=>{
@@ -927,6 +982,7 @@ function renderWhosQuestion(q) {
     document.getElementById('options-grid').appendChild(btn);
   });
 }
+
 function renderIdentifyQuestion(q) {
   document.getElementById('identify-name').textContent=displayName(q.correct.name);
   const grid=document.getElementById('img-options-grid'); grid.innerHTML='';
@@ -935,9 +991,11 @@ function renderIdentifyQuestion(q) {
     btn.className='img-opt-btn'; btn.dataset.name=opt.name;
     const spin=document.createElement('div'); spin.className='img-opt-spinner';
     const img=document.createElement('img'); img.alt=opt.name;
-    if (difficulty==='hard') img.classList.add('silhouette');
     img.style.opacity='0';
-    img.onload =()=>{ spin.style.display='none'; img.style.opacity='1'; };
+    img.onload=()=>{
+      if (difficulty==='hard') img.classList.add('silhouette');
+      spin.style.display='none'; img.style.opacity='1';
+    };
     img.onerror=()=>{ img.onerror=null; img.src=fallbackUrl(opt.id); };
     img.src=gifUrl(opt.name);
     btn.appendChild(spin); btn.appendChild(img);
@@ -945,6 +1003,7 @@ function renderIdentifyQuestion(q) {
     grid.appendChild(btn);
   });
 }
+
 function renderEvoQuestion(evoQ) {
   const img=document.getElementById('evo-pokemon-img'), spn=document.getElementById('evo-spinner');
   img.style.opacity='0'; spn.style.display='block';
@@ -978,9 +1037,11 @@ function renderEvoQuestion(evoQ) {
       btn.className='evo-opt-btn'; btn.dataset.name=opt.name;
       const spin=document.createElement('div'); spin.className='evo-opt-spinner';
       const img2=document.createElement('img'); img2.alt=opt.name;
-      if (difficulty==='hard') img2.classList.add('silhouette');
       img2.style.opacity='0';
-      img2.onload =()=>{ spin.style.display='none'; img2.style.opacity='1'; };
+      img2.onload=()=>{
+        if (difficulty==='hard') img2.classList.add('silhouette');
+        spin.style.display='none'; img2.style.opacity='1';
+      };
       img2.onerror=()=>{ img2.onerror=null; img2.src=fallbackUrl(opt.id); };
       img2.src=gifUrl(opt.name);
       const cap=document.createElement('div'); cap.className='evo-caption';
@@ -1136,7 +1197,7 @@ function filterLearnList() {
   buildLearnGrid(allPokemon.filter(p=>displayName(p.name).toLowerCase().includes(q)||String(p.id).padStart(3,'0').includes(q)));
 }
 async function openLearnDetail(pokemonId, fromBrowse=true) {
-  playClick();
+  // No click sound — pronunciation auto-plays as audio feedback
   learnCurrentId=pokemonId;
   if (fromBrowse) learnPreviousScreen='learn-browse-screen';
   const sprite=document.getElementById('learn-sprite'), spn=document.getElementById('learn-spinner');
@@ -1169,7 +1230,7 @@ async function openLearnDetail(pokemonId, fromBrowse=true) {
     .map(t=>`<span class="type-badge t-${t.type.name}" style="margin-right:4px">${capitalize(t.type.name)}</span>`).join('');
   const entry=specData.flavor_text_entries.find(e=>e.language.name==='en'&&(e.version.name==='red'||e.version.name==='blue'))||specData.flavor_text_entries.find(e=>e.language.name==='en');
   document.getElementById('learn-dex-entry').textContent=entry?entry.flavor_text.replace(/[\f\n\r]/g,' '):'No Pokédex entry available.';
-  // Auto-play pronunciation only (no cry on open)
+  // Auto-play pronunciation only
   if (soundOn) {
     stopLearnAudio();
     const btn=document.getElementById('learn-speaker-btn');
@@ -1187,15 +1248,6 @@ function stopLearnAudio() {
   const btn=document.getElementById('learn-speaker-btn');
   if (btn) btn.classList.remove('playing');
 }
-function playLearnAudioUrl(url) {
-  stopLearnAudio();
-  if (!soundOn) return;
-  learnAudio=new Audio(url);
-  const btn=document.getElementById('learn-speaker-btn');
-  btn.classList.add('playing');
-  learnAudio.play().catch(()=>btn.classList.remove('playing'));
-  learnAudio.onended=()=>btn.classList.remove('playing');
-}
 function playLearnAudio() {
   // Speaker button: play pronunciation then cry
   if (!learnCurrentId||!soundOn) return;
@@ -1204,7 +1256,9 @@ function playLearnAudio() {
   btn.classList.add('playing');
   learnAudio=new Audio(`sounds/eng_${String(learnCurrentId).padStart(3,'0')}.mp3`);
   learnAudio.play().catch(()=>{
-    playLearnAudioUrl(`https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${learnCurrentId}.ogg`);
+    learnAudio=new Audio(`https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${learnCurrentId}.ogg`);
+    learnAudio.play().catch(()=>btn.classList.remove('playing'));
+    learnAudio.onended=()=>btn.classList.remove('playing');
     return;
   });
   learnAudio.onended=()=>{
@@ -1250,7 +1304,7 @@ function renderLearnEvoTree(container,node,currentId) {
   }
 }
 function makeLearnEvoMember(p,currentId) {
-  if (!p) return null;   // skip Gen 2+ Pokémon not in our list (e.g. Pichu)
+  if (!p) return null;
   const wrap=document.createElement('div');
   wrap.className='learn-evo-member'+(p.id===currentId?' current':'');
   wrap.onclick=()=>{ if(p.id!==currentId) openLearnDetail(p.id,false); };

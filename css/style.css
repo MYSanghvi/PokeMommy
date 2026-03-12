@@ -43,6 +43,14 @@ small { font-family: 'Flexo', sans-serif; }
   font-family: 'Flexo', sans-serif; font-size: clamp(9px,2.2vw,13px);
   color: #444; margin-bottom: 6px; letter-spacing: 1px; line-height: 1.6;
 }
+.landing-logo {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
 .gen-selector {
   display: flex; justify-content: center; gap: 10px;
   margin-bottom: 28px; flex-wrap: wrap;

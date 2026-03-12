@@ -71,7 +71,7 @@ async function submitScore(pct) {
     quiz:       quizNames[quizType],
     name:       playerName,
     score:      `${correctCount}/${answeredCount}`,
-    accuracy:   pct+'%',
+    accuracy:   pct,                                  // store as plain integer
     time:       getTimeString(),
     difficulty: difficulty.charAt(0).toUpperCase()+difficulty.slice(1),
     date:(()=>{
@@ -98,15 +98,12 @@ let lbAllData=[];
 function showLeaderboard() {
   playClick();
 
-  // ── Lock to current quiz + difficulty — no tabs, no filters ──
   const quizLabels={
     whos:"Who's That Pokémon?",
     identify:'Identify the Pokémon',
     evo:'Spot the Evolution'
   };
   const diffLabel = difficulty.charAt(0).toUpperCase()+difficulty.slice(1);
-
-  // Update heading so user knows what they're viewing
   document.getElementById('lb-title').textContent =
     `🏆 ${quizLabels[quizType]} — ${diffLabel}`;
 
@@ -123,19 +120,17 @@ function closeLeaderboard() {
 async function fetchLeaderboard() {
   const wrap = document.getElementById('lb-table-wrap');
 
-  // Force the loading state with a completely standalone element —
-  // bypasses any CSS class that might hide .lb-loading
   wrap.innerHTML = '';
   const loadEl = document.createElement('p');
   loadEl.textContent = '⏳ Loading scores…';
   loadEl.setAttribute('style',
-    'padding:40px 20px; text-align:center; font-size:15px; ' +
-    'color:#555; font-family:sans-serif; display:block !important; visibility:visible !important;'
+    'padding:40px 20px;text-align:center;font-size:15px;' +
+    'color:#555;font-family:sans-serif;display:block !important;visibility:visible !important;'
   );
   wrap.appendChild(loadEl);
 
   const controller = new AbortController();
-  const timeout = setTimeout(()=> controller.abort(), 8000);
+  const timeout = setTimeout(()=>controller.abort(), 8000);
 
   try {
     const res = await fetch(`${APPS_SCRIPT_URL}?action=get`, {
@@ -145,7 +140,6 @@ async function fetchLeaderboard() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     let json = (await res.text()).trim();
-    // Strip any JSONP wrapper Apps Script might add
     if (json.startsWith('/*')) json = json.replace(/^\/\*.*?\*\//s,'').trim();
 
     lbAllData = JSON.parse(json);
@@ -158,8 +152,7 @@ async function fetchLeaderboard() {
     wrap.innerHTML = '';
     const errEl = document.createElement('p');
     errEl.setAttribute('style',
-      'padding:40px 20px; text-align:center; font-size:14px; ' +
-      'color:#888; font-family:sans-serif;'
+      'padding:40px 20px;text-align:center;font-size:14px;color:#888;font-family:sans-serif;'
     );
     errEl.innerHTML = e.name==='AbortError'
       ? '⏱ Request timed out.<br/>Check your connection.'
@@ -171,49 +164,69 @@ async function fetchLeaderboard() {
 // ── Render ────────────────────────────────────────────────────────
 function renderLeaderboardTable() {
   const wrap = document.getElementById('lb-table-wrap');
-  const quizNames={whos:"Who's That Pokémon?",identify:'Identify the Pokémon',evo:'Spot the Evolution'};
+  const quizNames={
+    whos:"Who's That Pokémon?",
+    identify:'Identify the Pokémon',
+    evo:'Spot the Evolution'
+  };
 
   // Filter to current quiz + difficulty only
   let data = lbAllData.filter(r =>
     r.quiz === quizNames[quizType] &&
-    r.difficulty && r.difficulty.toLowerCase() === difficulty.toLowerCase()
+    r.difficulty &&
+    r.difficulty.toLowerCase() === difficulty.toLowerCase()
   );
 
-  // Sort by accuracy desc, then time asc
-  data.sort((a,b)=>{
-    const pa=parseInt(a.accuracy)||0, pb=parseInt(b.accuracy)||0;
-    if(pb!==pa) return pb-pa;
-    return timeToSeconds(a.time)-timeToSeconds(b.time);
+  // ── Normalise accuracy to 0–100 integer ──────────────────────
+  // Handles "85%" (string), 0.85 (decimal float), 85 (integer)
+  data = data.map(r => {
+    let acc = r.accuracy;
+    if (typeof acc === 'string') {
+      acc = parseFloat(acc.replace('%',''));
+    } else if (typeof acc === 'number' && acc <= 1) {
+      acc = Math.round(acc * 100);
+    } else {
+      acc = Math.round(acc);
+    }
+    return { ...r, _acc: acc };
   });
-  data = data.slice(0,50);
 
-  if(data.length===0){
-    wrap.innerHTML='';
+  // Sort: accuracy desc, then time asc
+  data.sort((a,b) => {
+    if (b._acc !== a._acc) return b._acc - a._acc;
+    return timeToSeconds(a.time) - timeToSeconds(b.time);
+  });
+
+  data = data.slice(0, 50);
+
+  wrap.innerHTML = '';
+
+  if (data.length === 0) {
     const empty = document.createElement('p');
     empty.setAttribute('style',
-      'padding:40px 20px; text-align:center; font-size:14px; color:#888; font-family:sans-serif;'
+      'padding:40px 20px;text-align:center;font-size:14px;color:#888;font-family:sans-serif;'
     );
     empty.innerHTML = 'No scores yet for this quiz.<br/>Be the first! 🏆';
     wrap.appendChild(empty);
     return;
   }
 
-  const medals=['🥇','🥈','🥉'];
-  const rows=data.map((r,i)=>{
-    const isYou = r.name===playerName;
-    const rank  = i<3 ? medals[i] : `#${i+1}`;
-    const rankClass = i<3 ? `lb-rank lb-rank-${i+1}` : 'lb-rank';
-    return `<tr class="${isYou?'lb-you':''}">
+  const medals = ['🥇','🥈','🥉'];
+  const rows = data.map((r,i) => {
+    const isYou     = r.name === playerName;
+    const rank      = i < 3 ? medals[i] : `#${i+1}`;
+    const rankClass = i < 3 ? `lb-rank lb-rank-${i+1}` : 'lb-rank';
+    return `<tr class="${isYou ? 'lb-you' : ''}">
       <td><span class="${rankClass}">${rank}</span></td>
-      <td>${escHtml(r.name)}${isYou?' 👈':''}</td>
+      <td>${escHtml(r.name)}${isYou ? ' 👈' : ''}</td>
       <td>${escHtml(r.score)}</td>
-      <td>${escHtml(r.accuracy)}</td>
+      <td>${r._acc}%</td>
       <td>${escHtml(r.time)}</td>
       <td>${escHtml(r.date||'—')}</td>
     </tr>`;
   }).join('');
 
-  wrap.innerHTML=`
+  wrap.innerHTML = `
     <table class="lb-table">
       <thead>
         <tr>
@@ -225,12 +238,13 @@ function renderLeaderboardTable() {
     </table>`;
 }
 
+// ── Helpers ───────────────────────────────────────────────────────
 function timeToSeconds(timeStr) {
-  if(!timeStr) return 99999;
+  if (!timeStr) return 99999;
   const m = timeStr.match(/(\d+)m\s*(\d+)s/);
-  return m ? parseInt(m[1])*60+parseInt(m[2]) : 99999;
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 99999;
 }
 function escHtml(str) {
-  if(!str) return '—';
+  if (!str) return '—';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }

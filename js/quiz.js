@@ -1,4 +1,4 @@
-const SPRITE_MAP = {
+const SPRITE_MAP = {async function buildLearnEvoLine
   bulbasaur:'Bulbasaur',ivysaur:'Ivysaur',venusaur:'Venusaur',
   charmander:'Charmander',charmeleon:'Charmeleon',charizard:'Charizard',
   squirtle:'Squirtle',wartortle:'Wartortle',blastoise:'Blastoise',
@@ -524,30 +524,22 @@ async function buildLearnEvoLine(pokemonId, specData) {
   try {
     const cr=await fetch(specData.evolution_chain.url);
     const cd=await cr.json();
+
+    // Build full tree, skipping non-Gen1 but recursing through them
     function walkChain(node) {
       const p=allPokemon.find(x=>x.name===node.species.name);
-      const children=node.evolves_to.flatMap(c=>walkChain(c));
+      const children=node.evolves_to.map(walkChain).filter(n=>n!==null);
       if(p&&p.id<=151){
-        return [{
-          pokemon:p,
-          evolvesTo:node.evolves_to.map(c=>{
-            const cp=allPokemon.find(x=>x.name===c.species.name);
-            // if direct child is non-gen1, pull up its gen1 children
-            if(!cp||cp.id>151){
-              return c.evolves_to.map(gc=>{
-                const gcp=allPokemon.find(x=>x.name===gc.species.name);
-                return gcp&&gcp.id<=151?{pokemon:gcp,evolvesTo:[]}:null;
-              }).filter(Boolean);
-            }
-            return [{pokemon:cp,evolvesTo:[]}];
-          }).flat().filter(Boolean)
-        }];
+        return { pokemon:p, evolvesTo:children };
       }
-      return children;
+      // non-Gen1 node: skip it, bubble children up
+      return children.length>0 ? { pokemon:null, evolvesTo:children } : null;
     }
-    function buildChain(node,first=true) {
+
+    function buildChain(node, first=true) {
+      // skip null-pokemon nodes but still render their children
       if(!node.pokemon){
-        node.evolvesTo.forEach(child=>buildChain(child,first));
+        node.evolvesTo.forEach(child=>buildChain(child, first));
         return;
       }
       if(!first){
@@ -555,35 +547,35 @@ async function buildLearnEvoLine(pokemonId, specData) {
         arrow.className='learn-evo-arrow'; arrow.textContent='→';
         container.appendChild(arrow);
       }
-      const member=makeLearnEvoMember(node.pokemon,pokemonId);
+      const member=makeLearnEvoMember(node.pokemon, pokemonId);
       if(member) container.appendChild(member);
       if(node.evolvesTo.length===1){
-        buildChain(node.evolvesTo[0],false);
+        buildChain(node.evolvesTo[0], false);
       } else if(node.evolvesTo.length>1){
         const arrow=document.createElement('div');
         arrow.className='learn-evo-arrow'; arrow.textContent='→';
         container.appendChild(arrow);
         const branch=document.createElement('div'); branch.className='learn-evo-branch';
         node.evolvesTo.forEach(child=>{
-          if(child.pokemon&&child.pokemon.id<=151){
-            const m=makeLearnEvoMember(child.pokemon,pokemonId);
-            if(m) branch.appendChild(m);
-          }
+          const m=makeLearnEvoMember(child.pokemon, pokemonId);
+          if(m) branch.appendChild(m);
         });
         container.appendChild(branch);
       }
     }
+
     container.innerHTML='';
-    const nodes=walkChain(cd.chain);
-    if(!nodes.length){
+    const root=walkChain(cd.chain);
+    if(!root){
       container.innerHTML='<span style="font-size:12px;color:#aaa">No evolution data.</span>';
       return;
     }
-    buildChain(nodes[0],true);
+    buildChain(root, true);
   } catch(e) {
     container.innerHTML='<span style="font-size:12px;color:#aaa">Evolution data unavailable.</span>';
   }
 }
+
 
 function makeLearnEvoMember(p,currentId) {
   if(!p) return null;

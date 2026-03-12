@@ -57,7 +57,161 @@ let hintsRevealed=0, currentPokemonData=null;
 let autoNextTimer=null;
 const QUICK_COUNT=20;
 
-// ── Init AudioContext on first user gesture ───────────────────────
+// ════════════════════════════════════════════════════════════════
+// ── EASTER EGGS ─────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+
+// ── 1. Tap logo 10 times ─────────────────────────────────────────
+let logoTapCount=0, logoTapTimer=null;
+window.addEventListener('load', ()=>{
+  const logo = document.getElementById('landing-logo');
+  if (!logo) return;
+  logo.style.cursor = 'pointer';
+  logo.addEventListener('click', ()=>{
+    logoTapCount++;
+    if (logoTapTimer) clearTimeout(logoTapTimer);
+    logoTapTimer = setTimeout(()=>{ logoTapCount=0; }, 2000);
+    if (logoTapCount >= 10) {
+      logoTapCount = 0;
+      playSecretJingle();
+      celebrationConfetti(100);
+      showEasterEgg('🎴','A Wild MaulishMaster Appeared!',
+        'You found the secret trainer! The creator says: "Thanks for playing — this was made with love. 💛"');
+    }
+  });
+
+  // ── Night Mode ───────────────────────────────────────────────
+  checkNightMode();
+});
+
+function checkNightMode() {
+  const h = new Date().getHours();
+  if (h >= 23 || h < 3) {
+    playNightChime();
+    setTimeout(()=>{
+      showEasterEgg('🌙','Shouldn\'t you be asleep, Trainer?',
+        'It\'s late… but a true Pokémon Trainer never rests. Night mode activated. 🌟\n\nTake care of yourself — even Ash sleeps sometimes.');
+      document.body.style.filter = 'brightness(0.88) saturate(0.85)';
+    }, 1200);
+  }
+}
+
+// ── Easter egg overlay helpers ───────────────────────────────────
+function showEasterEgg(emoji, title, body) {
+  document.getElementById('easter-emoji').textContent = emoji;
+  document.getElementById('easter-title').textContent = title;
+  document.getElementById('easter-body').textContent  = body;
+  const overlay = document.getElementById('easter-overlay');
+  overlay.style.display = 'flex';
+  vibrate([50,30,50,30,100]);
+}
+function closeEasterEgg() {
+  document.getElementById('easter-overlay').style.display = 'none';
+}
+
+// ── 3. Trainer Name Easter Eggs ──────────────────────────────────
+const TRAINER_EGGS = {
+  'ash':           { emoji:'🎯', title:'I wanna be the very best!',    body:'Like no one ever was! To catch them is your real test, to train them is your cause! Welcome, Ash.' },
+  'gary':          { emoji:'😏', title:'Smell ya later!',               body:'Difficulty auto-set to Hard. You asked for it, Gary.' },
+  'misty':         { emoji:'💧', title:'Togepiiiii!',                   body:'The Cerulean City Gym Leader is here! Water-type Pokémon will feel extra familiar.' },
+  'brock':         { emoji:'🍳', title:'Leave it to me!',               body:'The Pewter City Gym Leader has arrived. Jelly-filled donuts for everyone!' },
+  'maulishmaster': { emoji:'👑', title:'Welcome back, Creator!',        body:'The one who built all this is here. This whole game was made with love — for family. 💛' },
+  'missingno':     null // handled separately below
+};
+
+function checkTrainerNameEgg(name) {
+  const key = name.toLowerCase().replace(/\s+/g,'');
+  if (key === 'missingno') {
+    triggerMissingNo();
+    return true;
+  }
+  if (key === 'gary') {
+    difficulty = 'hard';
+    document.getElementById('btn-easy').classList.remove('selected');
+    document.getElementById('btn-hard').classList.add('selected');
+    checkReady();
+  }
+  if (TRAINER_EGGS[key]) {
+    const egg = TRAINER_EGGS[key];
+    playSecretJingle();
+    setTimeout(()=> showEasterEgg(egg.emoji, egg.title, egg.body), 300);
+    return true;
+  }
+  return false;
+}
+
+// ── 4. MISSINGNO easter egg ──────────────────────────────────────
+function triggerMissingNo() {
+  playGlitchSound();
+  vibrate([100,50,200,50,100]);
+  const card = document.querySelector('.card');
+  card.style.transition = 'filter 0.1s';
+  let flickers = 0;
+  const glitch = setInterval(()=>{
+    card.style.filter = flickers%2===0 ? 'invert(1) hue-rotate(180deg)' : 'none';
+    flickers++;
+    if (flickers > 10) {
+      clearInterval(glitch);
+      card.style.filter = 'none';
+      showEasterEgg('👾','̴̢̛E̷R̵R̴O̸R̷: ̶M̸I̷S̶S̴I̵N̷G̸N̵O̴.',
+        'Oops… MissingNo. corrupted your save data!\n\n…Just kidding. Fixed it. 😅\n\nYour name has been accepted, glitch trainer.');
+    }
+  }, 120);
+}
+
+// ── 5. 100% Score — Mew appears ──────────────────────────────────
+function triggerMewEasterEgg() {
+  playMewChime();
+  const mew = document.createElement('img');
+  mew.src = gifUrl('mew');
+  mew.style.cssText = `
+    position:fixed; bottom:-80px; left:50%; transform:translateX(-50%);
+    width:80px; height:80px; object-fit:contain; z-index:9998;
+    transition: bottom 1.2s cubic-bezier(0.22,1,0.36,1), opacity 1s;
+    pointer-events:none; image-rendering:pixelated;
+  `;
+  document.body.appendChild(mew);
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      mew.style.bottom = '120px';
+    });
+  });
+  setTimeout(()=>{ mew.style.opacity='0'; }, 3200);
+  setTimeout(()=>{ mew.remove(); }, 4400);
+  setTimeout(()=>{
+    showEasterEgg('✨','A Wild Mew Appeared!',
+      'You scored 100%! Only the rarest trainers ever see Mew.\n\nYou are one of them. 🌟');
+  }, 1400);
+}
+
+// ── 6. Long-press sprite in Pokédex ──────────────────────────────
+let longPressTimer = null;
+function attachLongPress(imgEl, pokemonId) {
+  const start = ()=>{
+    longPressTimer = setTimeout(()=>{
+      longPressTimer = null;
+      vibrate([30,20,30]);
+      playLearnCry(pokemonId);
+    }, 600);
+  };
+  const cancel = ()=>{ if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; } };
+  imgEl.addEventListener('mousedown',  start);
+  imgEl.addEventListener('touchstart', start, {passive:true});
+  imgEl.addEventListener('mouseup',    cancel);
+  imgEl.addEventListener('mouseleave', cancel);
+  imgEl.addEventListener('touchend',   cancel);
+}
+function playLearnCry(pokemonId) {
+  if (!soundOn) return;
+  const cry = new Audio(`https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${pokemonId}.ogg`);
+  cry.volume = 0.5;
+  cry.play().catch(()=>{});
+}
+
+// ════════════════════════════════════════════════════════════════
+// ── INIT ─────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+
 document.addEventListener('touchstart', ()=>getCtx(), {once:true, passive:true});
 document.addEventListener('mousedown',  ()=>getCtx(), {once:true});
 
@@ -198,8 +352,17 @@ function buildEvoOptions(evoQ) {
 }
 
 async function startGame() {
-  getCtx(); playClick(); stopWhosThatAudio();
-  playerName=document.getElementById('player-name').value.trim();
+  getCtx(); stopWhosThatAudio();
+
+  // ── Check trainer name easter eggs before starting ────────────
+  const rawName = document.getElementById('player-name').value.trim();
+  const isEgg = checkTrainerNameEgg(rawName);
+
+  // Block MISSINGNO from starting — they must re-enter a real name
+  if (rawName.toLowerCase().replace(/\s+/g,'') === 'missingno') return;
+
+  playClick();
+  playerName = rawName;
   document.getElementById('start-btn').disabled=true;
   document.getElementById('start-btn').textContent='Loading…';
   if(!allPokemon.length) await loadPokemonList();
@@ -323,7 +486,6 @@ function renderEvoQuestion(evoQ) {
   });
 }
 
-// ── Auto-next helpers ────────────────────────────────────────────
 function clearAutoNext() {
   if(autoNextTimer){ clearInterval(autoNextTimer); autoNextTimer=null; }
   const nxt=document.getElementById('next-btn');
@@ -441,6 +603,8 @@ function buildLearnGrid(list) {
     card.onclick=()=>openLearnDetail(p.id);
     const img=document.createElement('img');
     img.src=gifUrl(p.name); img.onerror=()=>{img.onerror=null;img.src=fallbackUrl(p.id);};
+    img.style.cursor = 'pointer';
+    attachLongPress(img, p.id);  // ── Easter egg: long press for cry
     const num=document.createElement('div'); num.className='lc-num'; num.textContent='#'+String(p.id).padStart(3,'0');
     const name=document.createElement('div'); name.className='lc-name';
     name.style.fontFamily="'Flexo', sans-serif";
@@ -478,6 +642,7 @@ async function openLearnDetail(pokemonId,fromBrowse=true) {
   sprite.onload=()=>{ spn.style.display='none'; sprite.style.opacity='1'; };
   sprite.onerror=()=>{ sprite.onerror=null; sprite.src=fallbackUrl(pokemonId); };
   sprite.src=gifUrl(p.name);
+  attachLongPress(sprite, pokemonId); // ── Easter egg: long press on detail sprite too
   const nameEl=document.getElementById('learn-detail-name');
   nameEl.textContent=displayName(p.name);
   nameEl.style.fontFamily="'Flexo', sans-serif";
@@ -529,63 +694,33 @@ async function buildLearnEvoLine(pokemonId, specData) {
   try {
     const cr=await fetch(specData.evolution_chain.url);
     const cd=await cr.json();
-
     function walkChain(node) {
       const p=allPokemon.find(x=>x.name===node.species.name);
-      // recursively build children first
       const children=node.evolves_to.map(walkChain).filter(n=>n!==null);
-      if(p&&p.id<=151){
-        // this is a valid Gen1 node — attach its Gen1 children
-        return { pokemon:p, evolvesTo:children };
-      }
-      // non-Gen1 node — skip it but bubble its children up
+      if(p&&p.id<=151) return { pokemon:p, evolvesTo:children };
       return children.length>0 ? { pokemon:null, evolvesTo:children } : null;
     }
-
     function buildChain(node, first=true) {
-      if(!node.pokemon){
-        // transparent node — render children at same level
-        node.evolvesTo.forEach(child=>buildChain(child, first));
-        return;
-      }
-      if(!first){
-        const arrow=document.createElement('div');
-        arrow.className='learn-evo-arrow'; arrow.textContent='→';
-        container.appendChild(arrow);
-      }
+      if(!node.pokemon){ node.evolvesTo.forEach(child=>buildChain(child, first)); return; }
+      if(!first){ const arrow=document.createElement('div'); arrow.className='learn-evo-arrow'; arrow.textContent='→'; container.appendChild(arrow); }
       const member=makeLearnEvoMember(node.pokemon, pokemonId);
       if(member) container.appendChild(member);
-      if(node.evolvesTo.length===1){
-        // linear chain — recurse
-        buildChain(node.evolvesTo[0], false);
-      } else if(node.evolvesTo.length>1){
-        // branching chain e.g. Eevee
-        const arrow=document.createElement('div');
-        arrow.className='learn-evo-arrow'; arrow.textContent='→';
-        container.appendChild(arrow);
+      if(node.evolvesTo.length===1){ buildChain(node.evolvesTo[0], false); }
+      else if(node.evolvesTo.length>1){
+        const arrow=document.createElement('div'); arrow.className='learn-evo-arrow'; arrow.textContent='→'; container.appendChild(arrow);
         const branch=document.createElement('div'); branch.className='learn-evo-branch';
-        node.evolvesTo.forEach(child=>{
-          if(child.pokemon){
-            const m=makeLearnEvoMember(child.pokemon, pokemonId);
-            if(m) branch.appendChild(m);
-          }
-        });
+        node.evolvesTo.forEach(child=>{ if(child.pokemon){ const m=makeLearnEvoMember(child.pokemon, pokemonId); if(m) branch.appendChild(m); } });
         container.appendChild(branch);
       }
     }
-
     container.innerHTML='';
     const root=walkChain(cd.chain);
-    if(!root){
-      container.innerHTML='<span style="font-size:12px;color:#aaa">No evolution data.</span>';
-      return;
-    }
+    if(!root){ container.innerHTML='<span style="font-size:12px;color:#aaa">No evolution data.</span>'; return; }
     buildChain(root, true);
   } catch(e) {
     container.innerHTML='<span style="font-size:12px;color:#aaa">Evolution data unavailable.</span>';
   }
 }
-
 function makeLearnEvoMember(p,currentId) {
   if(!p) return null;
   const wrap=document.createElement('div');
@@ -641,7 +776,7 @@ function displayName(name) {
   return m[name]||capitalize(name);
 }
 function burstConfetti() {
-  confetti({ particleCount:65, spread:70, origin:{y:0.58}, colors:['#ff4444','#ffcc00','#44aa44','#4488ff','#ff88cc','#ffffff'] });
+  confetti({ particleCount:65, spread:70, origin:{y:0.58}, colors:['#FFCB05','#3D7DCA','#003A70','#ffffff','#ff88cc'] });
 }
 function celebrationConfetti(pct) {
   if(pct<60) return;
@@ -649,7 +784,35 @@ function celebrationConfetti(pct) {
   let fired=0;
   const iv=setInterval(()=>{
     confetti({ particleCount:count, angle:fired%2===0?60:120, spread:80,
-      origin:{x:fired%2===0?0.1:0.9,y:0.6}, colors:['#cc0000','#ffcc00','#ffffff','#ff6666','#ffee88'] });
+      origin:{x:fired%2===0?0.1:0.9,y:0.6}, colors:['#FFCB05','#3D7DCA','#003A70','#ffffff','#ffee88'] });
     if(++fired>=rounds*2) clearInterval(iv);
   },340);
+}
+
+// ── Results & timer (stubs expected from leaderboard.js) ─────────
+function showResults() {
+  stopTimer();
+  const total=questions.length, pct=Math.round(correctCount/total*100);
+  document.getElementById('result-player-name').textContent=playerName;
+  document.getElementById('result-pct').textContent=pct+'%';
+  document.getElementById('result-score-sub').textContent=`${correctCount} / ${total} correct`;
+  document.getElementById('result-time').textContent=`Time: ${document.getElementById('timer-display').textContent}`;
+  const msgs=[
+    [100,'✨ PERFECT SCORE! Legendary Trainer! ✨'],
+    [80,'🏆 Amazing! You\'re a Pokémon Master!'],
+    [60,'⭐ Great work, Trainer!'],
+    [40,'💪 Good effort! Keep training!'],
+    [0,'🌱 Every trainer starts somewhere!']
+  ];
+  const [,msg]=msgs.find(([t])=>pct>=t);
+  document.getElementById('result-msg').textContent=msg;
+  document.getElementById('result-emoji').textContent=pct===100?'🏆':pct>=80?'⭐':pct>=60?'😊':pct>=40?'💪':'🌱';
+  playFanfare();
+  celebrationConfetti(pct);
+
+  // ── 100% Mew easter egg ───────────────────────────────────────
+  if (pct === 100) setTimeout(triggerMewEasterEgg, 800);
+
+  showScreen('result-screen');
+  if(typeof submitScore==='function') submitScore(playerName, pct, correctCount, total, quizType, difficulty, quizMode);
 }

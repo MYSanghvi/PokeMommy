@@ -391,19 +391,19 @@ function triggerMewEasterEgg() {
 // ── 6. Long-press sprite for cry ─────────────────────────────────
 let longPressTimer = null;
 function attachLongPress(imgEl, pokemonId) {
-  const start  = ()=>{
-    longPressTimer = setTimeout(()=>{
-      longPressTimer = null;
-      vibrate([30,20,30]);
-      playLearnCry(pokemonId);
-    }, 600);
-  };
-  const cancel = ()=>{ if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; } };
-  imgEl.addEventListener('mousedown',  start);
-  imgEl.addEventListener('touchstart', start,  {passive:true});
-  imgEl.addEventListener('mouseup',    cancel);
-  imgEl.addEventListener('mouseleave', cancel);
-  imgEl.addEventListener('touchend',   cancel);
+const start = ()=>{
+longPressTimer = setTimeout(()=>{
+longPressTimer = null;
+vibrate([30,20,30]);
+playLearnCry(pokemonId);
+}, 600);
+};
+const cancel = ()=>{ if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; } };
+imgEl.onmousedown  = start;
+imgEl.ontouchstart = start;
+imgEl.onmouseup    = cancel;
+imgEl.onmouseleave = cancel;
+imgEl.ontouchend   = cancel;
 }
 function playLearnCry(pokemonId) {
   if (!soundOn) return;
@@ -889,13 +889,9 @@ if(soundOn){
   await buildLearnEvoLine(pokemonId,specData);
 }
 function stopLearnAudio() {
-  if(learnAudio){ 
-    learnAudio.onended = null;
-    learnAudio.pause(); 
-    learnAudio = null; 
-  }
-  const btn = document.getElementById('learn-speaker-btn');
-  if(btn) btn.classList.remove('playing');
+if(learnAudio){ learnAudio.onended=null; learnAudio.pause(); learnAudio=null; }
+const btn=document.getElementById('learn-speaker-btn');
+if(btn) btn.classList.remove('playing');
 }
 function playLearnAudio() {
   if(!learnCurrentId||!soundOn) return;

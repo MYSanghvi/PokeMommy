@@ -233,27 +233,72 @@ function checkNightMode() {
 
 // ── 3. Trainer name eggs ─────────────────────────────────────────
 const TRAINER_EGGS = {
-  'ash':           { emoji:'🎯', img:'img/ash_img.png',
+  'ash':           { emoji:'🎯', img:'img/ash.png',
                      title:'I wanna be the very best!',
                      body:'Like no one ever was! To catch them is your real test, to train them is your cause! Welcome, Ash.' },
-  'gary':          { emoji:'😏', img:'img/gary_img.png',
+  'gary':          { emoji:'😏', img:'img/gary.png',
                      title:'Smell ya later!',
                      body:'Difficulty auto-set to Hard. You asked for it, Gary.' },
-  'misty':         { emoji:'💧', img:'img/misty_img.png',
+  'misty':         { emoji:'💧', img:'img/misty.png',
                      title:'Togepiiiii!',
                      body:'The Cerulean City Gym Leader is here! Water-type Pokémon will feel extra familiar.' },
-  'brock':         { emoji:'🍳', img:'img/brock_img.png',
+  'brock':         { emoji:'🍳', img:'img/brock.png',
                      title:'Leave it to me!',
                      body:'The Pewter City Gym Leader has arrived. Jelly-filled donuts for everyone!' },
-  'maulishmaster': { emoji:'👑', img:'img/maulishmaster_img.png',
-                     title:'Welcome back, boss!',
-                     body:'The Pokémon are safe, the leaderboard works (mostly), all the coding at 3 AM has finally paid off!' },
-  'thewifey':      { emoji:'💛', img:'img/thewifey_img.png',
-                     title:'The Most Important Trainer!',
-                     body:'Yes, the quiz was literally built for you. No pressure. 😄💛' },
-  'helu':          { emoji:'🎮', img:'img/helu_img.png',
-                     title:'Player 2 Has Joined!',
-                     body:"Before the quiz, before the code — there was you, a GameBoy SP, and way too many arguments about who got to play Pokémon Emerald 💚" },
+  'maulishmaster': [
+    { emoji:'🔍', img:'img/maulishmaster.png',
+      title:'True Trainer Detected!',
+      body:"You didn't just play the game. You went looking for more. That's the kind of trainer energy we love." },
+    { emoji:'🗝️', img:'img/maulishmaster.png',
+      title:'The Pokédex Knows a Secret!',
+      body:"You typed the magic words. The Pokédex has unlocked a secret it doesn't even know about." },
+    { emoji:'🥚', img:'img/maulishmaster.png',
+      title:'Easter Egg Discovered!',
+      body:'You found the easter egg. You typed the magic name. You are now officially the coolest trainer here.' },
+    { emoji:'⚡', img:'img/maulishmaster.png',
+      title:'A Legendary Name…',
+      body:"Only the most legendary trainers carry that name. Let's see if you live up to it." }
+  ],
+  'thewifey': [
+    { emoji:'💛', img:'img/thewifey.png',
+      title:'The Most Important Trainer!',
+      body:"Yes, the quiz was literally built for you. No pressure. 😄" },
+    { emoji:'💛️', img:'img/thewifey.png',
+      title:'The Ultimate Champion',
+      body:"You've already completed the hardest quest; growing a tiny trainer. This quiz should be easy!" },
+    { emoji:'🥚', img:'img/thewifey.png',
+      title:'An Egg Is About To Hatch!',
+      body:"Professor Oak confirms: a brand new trainer is on the way! Until then, let's see if Mom still remembers her Pokémon." },
+	{ emoji:'✨', img:'img/thewifey.png',
+      title:'The Shiny Trainer Appears!',
+      body:"A rare and powerful trainer has appeared. Bonus points for carrying the rarest Pokémon of all: Baby!" },
+	{ emoji:'✨', img:'img/thewifey.png',
+      title:'The Favorite Trainer',
+      body:"Out of all the trainers in the world, you're the one I choose. Now go catch that high score." },
+    { emoji:'🍼', img:'img/thewifey.png',
+      title:'Future Pokémon Mom',
+      body:"Soon you'll be raising two things: a baby… and a new generation of Pokémon trainers." }
+  ],
+  'helu': [
+    { emoji:'🎮', img:'img/helu.png',
+      title:'Player 2 Has Joined!',
+      body:"Before the quiz, before the code, there was you, a GameBoy SP, and way too many arguments about who got to play Pokémon Emerald 💚" },
+    { emoji:'🎮', img:'img/helu.png',
+      title:'Rival Battle!',
+      body:"Warning: childhood Pokémon rivalry detected. Prepare for intense sibling competition." },
+    { emoji:'🕹️', img:'img/helu.png',
+      title:'The OG Player 2',
+      body:"From fighting over the GameBoy to battling over Pokémon Emerald - some things never change." },
+	{ emoji:'⚡', img:'img/helu.png',
+      title:'Sibling Rival Activated',
+      body:"All childhood Pokémon debates are about to be settled. Once and for all." },
+	{ emoji:'🎲', img:'img/helu.png',
+      title:'Battle Mode: ON',
+      body:"You survived the sibling battles of childhood. This quiz should be easy." },
+    { emoji:'💚', img:'img/helu.png',
+      title:'Pokémon Emerald Veteran',
+      body:"A trainer forged in the fires of GameBoy SP arguments enters the arena." }
+  ],
   'missingno':     null
 };
 
@@ -268,6 +313,27 @@ function checkTrainerNameEgg(name) {
     document.getElementById('btn-easy').classList.remove('selected');
     document.getElementById('btn-hard').classList.add('selected');
     checkReady();
+  }
+  if (key === 'maulish' || key === 'maulishmaster') {
+    const variants = TRAINER_EGGS['maulishmaster'];
+    const egg = variants[Math.floor(Math.random() * variants.length)];
+    playSecretJingle();
+    setTimeout(() => showEasterEgg(egg.emoji, egg.title, egg.body, egg.img || null), 300);
+    return true;
+  }
+    if (key === 'thewifey' || key === 'sssiddhi') {
+    const variants = TRAINER_EGGS['thewifey'];
+    const egg = variants[Math.floor(Math.random() * variants.length)];
+    playSecretJingle();
+    setTimeout(() => showEasterEgg(egg.emoji, egg.title, egg.body, egg.img || null), 300);
+    return true;
+  }
+    if (key === 'helu' || key === 'preeyanshee') {
+    const variants = TRAINER_EGGS['helu'];
+    const egg = variants[Math.floor(Math.random() * variants.length)];
+    playSecretJingle();
+    setTimeout(() => showEasterEgg(egg.emoji, egg.title, egg.body, egg.img || null), 300);
+    return true;
   }
   if (TRAINER_EGGS[key]) {
     const egg = TRAINER_EGGS[key];
@@ -292,7 +358,7 @@ function triggerMissingNo() {
       clearInterval(glitch);
       card.style.filter = 'none';
       showEasterEgg('👾', 'E̷R̵R̴O̸R̷: M̸I̷S̶S̴I̵N̷G̸N̵O̴.',
-        'Oops… MissingNo. corrupted your save data!\n\n…Just kidding. Fixed it. 😅\n\nYour name has been accepted, glitch trainer.');
+        'A wild MissingNo. appeared and corrupted the quiz data!. 😅\n\nThat Trainer Name can’t be registered. Please choose a different one!');
     }
   }, 120);
 }

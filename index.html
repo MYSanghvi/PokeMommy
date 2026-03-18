@@ -14,7 +14,69 @@
 <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+<!-- ── Welcome Message Starts ── -->
 
+<div id="welcome-popup" style="display:none; position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+  justify-content:center; align-items:center; padding:20px;">
+  <div style="background:#fff; border-radius:20px; max-width:360px; width:100%;
+    padding:28px 24px; box-shadow:0 8px 40px rgba(0,58,112,0.25);
+    font-family:'Flexo',sans-serif; text-align:center; position:relative;">
+    
+    <div style="font-size:40px; margin-bottom:8px;">🎮</div>
+    <h2 style="color:#003A70; font-size:20px; margin:0 0 6px;">
+      Welcome, Trainer!
+    </h2>
+    <p style="color:#3D7DCA; font-size:12px; font-weight:600; margin:0 0 14px; letter-spacing:0.5px;">
+      A New Journey Begins...
+    </p>
+
+    <p style="color:#444; font-size:13.5px; line-height:1.65; margin:0 0 14px;">
+      This game was built for one special person — but every trainer is welcome here. 
+      Whether you grew up with a Pokédex or just discovered it, this is your world now.
+    </p>
+
+    <div style="background:#f0f6ff; border-radius:12px; padding:12px 14px;
+      margin-bottom:14px; text-align:left;">
+      <p style="margin:0 0 6px; font-size:12px; font-weight:700;
+        color:#003A70; text-transform:uppercase; letter-spacing:0.5px;">
+        🕵️ Trainer Tip
+      </p>
+      <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
+        Some trainer names unlock <em>special surprises</em>. 
+        Try names like <strong>Ash</strong>, <strong>Brock</strong>, or 
+        maybe something a little more… legendary. 👀
+      </p>
+    </div>
+
+    <div style="background:#fffbf0; border:1px dashed #FFCB05; border-radius:12px;
+      padding:12px 14px; margin-bottom:20px; text-align:left;">
+      <p style="margin:0 0 4px; font-size:12px; font-weight:700;
+        color:#b8860b; text-transform:uppercase; letter-spacing:0.5px;">
+        🥚 Hidden Easter Eggs
+      </p>
+      <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
+        There are secrets scattered all over this quiz. 
+        The greatest trainers don't just play. They <strong>discover</strong>. Will you?
+      </p>
+    </div>
+
+    <button onclick="closeWelcomePopup()"
+      style="background:#3D7DCA; color:#fff; border:none; border-radius:12px;
+      padding:13px 0; width:100%; font-size:15px; font-weight:700;
+      font-family:'Flexo',sans-serif; cursor:pointer; letter-spacing:0.3px;
+      transition:background 0.2s;">
+      Begin Journey!
+    </button>
+
+    <p style="margin:10px 0 0; font-size:11px; color:#aaa;">
+      Made with ❤️ by a trainer who believes in you.
+    </p>
+  </div>
+</div>
+
+
+<!-- ── Welcome Message Ends ── -->
 <!-- ── Easter Egg Overlay ── -->
 <div id="easter-overlay" style="
   display:none; position:fixed; inset:0; z-index:9999;
@@ -289,7 +351,6 @@
   
   <div class="dedication">Made for my wife and our little future Pokémon Trainer she's carrying.</div>
   <div>Created by MaulishMaster, a fellow Pokémon Trainer.</div>
-  <div>Pokémon sprites by <a href="https://github.com/Nackha1/Hd-sprites" target="_blank">TilableToast / FurretTurret</a></div>
   <div class="disclaimer">
     Pokémon and all respective names are trademarks and © of Nintendo, Game Freak, and Creatures Inc.<br/>
     This is a non-commercial fan project and is not affiliated with or endorsed by The Pokémon Company.

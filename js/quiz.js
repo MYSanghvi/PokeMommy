@@ -1086,6 +1086,10 @@ function celebrationConfetti(pct) {
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
 
+  // Don't fire while user is typing in the name field
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
   // Welcome popup "Let's Go!" button
   const popup = document.getElementById('welcome-popup');
   if (popup && popup.style.display === 'flex') {
@@ -1098,16 +1102,22 @@ document.addEventListener('keydown', (e) => {
     closeEasterEgg(); return;
   }
 
-  // "Begin Journey" / Start Quiz button
+  // "Begin Journey" — check parent screen is actually visible
   const startBtn = document.getElementById('start-btn');
-  if (startBtn && !startBtn.disabled && startBtn.offsetParent !== null) {
-    startBtn.click(); return;
+  if (startBtn && !startBtn.disabled) {
+    const screen = startBtn.closest('[id$="-screen"]');
+    if (screen && screen.style.display !== 'none') {
+      startBtn.click(); return;
+    }
   }
 
-  // "Next Question" / "See Results" button
+  // "Next Question" / "See Results"
   const nextBtn = document.getElementById('next-btn');
-  if (nextBtn && nextBtn.style.display !== 'none' && nextBtn.offsetParent !== null) {
-    nextBtn.click(); return;
+  if (nextBtn && nextBtn.style.display !== 'none') {
+    const screen = nextBtn.closest('[id$="-screen"]');
+    if (screen && screen.style.display !== 'none') {
+      nextBtn.click(); return;
+    }
   }
 });
 

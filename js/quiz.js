@@ -53,7 +53,7 @@ const FALLBACK_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/
 function gifUrl(name) { return 'img/sprites/' + name + '.gif'; }
 function fallbackUrl(id) { return FALLBACK_BASE+id+'.png'; }
 
-let quizType=null, difficulty=null, quizMode='quick', playerName='';
+let quizType=null, difficulty=null, quizMode='quick', playerName='', playerGender='boy';
 let allPokemon=[], questions=[], currentQ=0, correctCount=0, answeredCount=0;
 let hintsRevealed=0, currentPokemonData=null;
 let autoNextTimer=null;
@@ -87,10 +87,26 @@ function closeWelcomePopup() {
 
 // ── Trainer Name Popup ───────────────────────────────────────────
 function showNamePopup() {
-  const popup = document.getElementById('name-popup');
-  popup.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('name-popup-input').focus(), 100);
+const popup = document.getElementById('name-popup');
+popup.style.display = 'flex';
+document.body.style.overflow = 'hidden';
+setTimeout(() => document.getElementById('name-popup-input').focus(), 100);
+const savedGender = localStorage.getItem('pokemommy_gender') || 'boy';
+selectGender(savedGender);
+}
+
+function selectGender(gender) {
+  playerGender = gender;
+  localStorage.setItem('pokemommy_gender', gender);
+  const boyBtn = document.getElementById('gender-boy');
+  const girlBtn = document.getElementById('gender-girl');
+  if (gender === 'boy') {
+    boyBtn.style.cssText += ';background:#3D7DCA;border-color:#3D7DCA;color:#fff;';
+    girlBtn.style.cssText += ';background:#f9f9f9;border-color:#ddd;color:#666;';
+  } else {
+    girlBtn.style.cssText += ';background:#3D7DCA;border-color:#3D7DCA;color:#fff;';
+    boyBtn.style.cssText += ';background:#f9f9f9;border-color:#ddd;color:#666;';
+  }
 }
 
 function checkNamePopupReady() {
@@ -939,6 +955,8 @@ async function startGame() {
   currentQ=0; correctCount=0; answeredCount=0;
   document.getElementById('q-total').textContent=questions.length;
   document.getElementById('player-display').textContent=playerName;
+const genderImg = document.getElementById('trainer-gender-img');
+if (genderImg) genderImg.src = playerGender === 'girl' ? 'img/girl_ow.png' : 'img/boy_ow.png';
   document.getElementById('whos-section').style.display    =quizType==='whos'    ?'block':'none';
   document.getElementById('identify-section').style.display=quizType==='identify'?'block':'none';
   document.getElementById('evo-section').style.display     =quizType==='evo'     ?'block':'none';

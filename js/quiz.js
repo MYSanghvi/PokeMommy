@@ -58,7 +58,7 @@ let allPokemon=[], questions=[], currentQ=0, correctCount=0, answeredCount=0;
 let hintsRevealed=0, currentPokemonData=null;
 let autoNextTimer=null;
 let onEasterEggClose = null;
-let elapsedSeconds = 0;
+let elapsedSeconds = 0, elapsedTenths = 0;
 const QUICK_COUNT=20;
 let sessionId = '';
 
@@ -963,8 +963,9 @@ async function startGame() {
   document.getElementById('identify-section').style.display=quizType==='identify'?'block':'none';
   document.getElementById('evo-section').style.display     =quizType==='evo'     ?'block':'none';
   showScreen('game-screen');
-  await preloadQuestionImages(0, 3);
+  await preloadQuestionImages(0, 2);
   renderQuestion();
+  preloadQuestionImages(2, 4);
 
 
 startTimer();
@@ -981,12 +982,18 @@ function getTimeString() {
   return `${m}:${s.toString().padStart(2,'0')}`;
 }
 
-function preloadQuestionImages(startIdx, count) {
+async function preloadQuestionImages(startIdx, count) {
   const toLoad = questions.slice(startIdx, startIdx + count);
-  toLoad.forEach(q=>{
-    const img = new Image();
-    img.src = gifUrl(q.correct.name);
-  });
+  for (const q of toLoad) {
+    if (quizType === 'evo') {
+      if (!q.evoQ) q.evoQ = await buildEvoQuestion(q.correct);
+      if (!q.evoQ.options) q.evoQ.options = buildEvoOptions(q.evoQ);
+      q.evoQ.options.filter(o => !o.isNone).forEach(o => { new Image().src = gifUrl(o.name); });
+    } else {
+      if (!q.options) q.options = await buildOptions(q.correct);
+      q.options.forEach(o => { new Image().src = gifUrl(o.name); });
+    }
+  }
 }
 
 async function renderQuestion() {

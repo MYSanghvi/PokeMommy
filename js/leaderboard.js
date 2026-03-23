@@ -1,24 +1,25 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrQs92eiCFtd2-TJd7iWQH-ZJhaHcLfcmNBf608pqSGLjeZS2YNdxgekOBw5TLt_g/exec';
 
 // ── Timer ────────────────────────────────────────────────────────
-let timerInterval=null, timerSeconds=0;
+let timerInterval=null, timerSeconds=0, timerTenths=0;
 
 function startTimer() {
   stopTimer();
-  timerSeconds=0;
-  document.getElementById('timer-display').textContent='0:00';
+  timerSeconds=0; timerTenths=0;
+  document.getElementById('timer-display').textContent='0:00.0';
   timerInterval=setInterval(()=>{
-    timerSeconds++;
-    const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
-    document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}`;
-  },1000);
+    timerTenths++;
+    timerSeconds=Math.floor(timerTenths/10);
+    const m=Math.floor(timerSeconds/60), s=timerSeconds%60, t=timerTenths%10;
+    document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}.${t}`;
+  },100);
 }
 function stopTimer() {
   if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
 }
 function getTimeString() {
-  const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
-  return `${m}m ${String(s).padStart(2,'0')}s`;
+  const m=Math.floor(timerSeconds/60), s=timerSeconds%60, t=timerTenths%10;
+  return `${m}m ${String(s).padStart(2,'0')}.${t}s`;
 }
 
 // ── Result Audio ─────────────────────────────────────────────────
@@ -296,8 +297,8 @@ const youBadge = isYou ? ' <span style="background:#3D7DCA;color:#fff;font-size:
 // ── Helpers ───────────────────────────────────────────────────────
 function timeToSeconds(timeStr) {
   if (!timeStr) return 99999;
-  const m = timeStr.match(/(\d+)m\s*(\d+)s/);
-  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 99999;
+  const m = timeStr.match(/(\d+)m\s*(\d+)(?:\.(\d))?s/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) + (parseInt(m[3]||'0')/10) : 99999;
 }
 function escHtml(str) {
   if (!str) return '—';

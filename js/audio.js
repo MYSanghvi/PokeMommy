@@ -5,6 +5,32 @@ whosThatAudio.preload = 'auto';
 
 let audioCtx = null, soundOn = true;
 
+// ── SETTINGS ─────────────────────────────────────────────────────
+let sfxVolume   = parseFloat(localStorage.getItem('pm_sfx_vol')  ?? '0.7');
+let musicVolume = parseFloat(localStorage.getItem('pm_music_vol') ?? '0.5');
+let spriteStyle = localStorage.getItem('pm_sprite_style') || 'sd';
+let autoDuck    = localStorage.getItem('pm_auto_duck') !== 'false';
+let bgmAudio    = null;
+
+function initBgm() {
+  if (bgmAudio) return;
+  bgmAudio = new Audio('sounds/littleroot_town.mp3');
+  bgmAudio.loop = true;
+  bgmAudio.volume = soundOn ? musicVolume : 0;
+  bgmAudio.play().catch(() => {});
+}
+function applyBgmVolume() {
+  if (!bgmAudio) return;
+  bgmAudio.volume = soundOn ? musicVolume : 0;
+}
+function duckBgm() {
+  if (!bgmAudio || !autoDuck) return;
+  bgmAudio.volume = soundOn ? musicVolume * 0.2 : 0;
+}
+function unduckBgm() { applyBgmVolume(); }
+// ── SETTINGS ─────────────────────────────────────────────────────
+
+
 function vibrate(pattern) {
   try { if(navigator.vibrate) navigator.vibrate(pattern); } catch(e) {}
 }
@@ -14,6 +40,7 @@ function getCtx() {
 }
 function tone(freq, type, dur, vol=0.28, delay=0) {
   if (!soundOn) return;
+   const scaledVol = vol * sfxVolume; 
   try {
     const ctx = getCtx();
     // ── Resume if suspended before scheduling any nodes ─────────
@@ -51,6 +78,7 @@ function playClick() {
   if (!soundOn) return;
   // ── Resume context instantly if suspended ────────────────────
   const ctx = getCtx();
+  clickAudio.volume = sfxVolume;  
   if (ctx.state === 'suspended') {
     ctx.resume().then(()=>{
       clickAudio.currentTime = 0;
@@ -94,6 +122,7 @@ function toggleSound() {
   btn.classList.toggle('muted', !soundOn);
   if (soundOn) getCtx();
   else { stopLearnAudio(); stopResultAudio(); stopWhosThatAudio(); }
+  applyBgmVolume();
 }
 
 function stopResultAudio() {

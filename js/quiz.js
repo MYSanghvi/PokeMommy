@@ -51,7 +51,9 @@ const SPRITE_MAP = {
 const FALLBACK_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 // function gifUrl(name)    { return GIF_BASE+(SPRITE_MAP[name]||capitalize(name))+'.gif'; } HD GIF source
 function gifUrl(name) {
-	return 'img/sprites/' + name + '.gif';
+  if (spriteStyle === 'hd')     return 'img/spriteshd/'     + name + '.gif';
+  if (spriteStyle === 'static') return 'img/spritesstatic/' + name + '.png';
+  return 'img/sprites/' + name + '.gif';
 }
 
 function fallbackUrl(id) {
@@ -76,6 +78,8 @@ let elapsedSeconds = 0,
 	elapsedTenths = 0;
 const QUICK_COUNT = 20;
 let sessionId = '';
+
+
 
 // ════════════════════════════════════════════════════════════════
 // ── WELCOME POPUP MESSAGE
@@ -143,12 +147,14 @@ function confirmTrainerName() {
 		return;
 	}
 
-	playerName = val;
-	document.getElementById('player-name').value = val;
-	localStorage.setItem('pokemommy_trainer_name', val);
-	document.getElementById('name-popup').style.display = 'none';
-	document.body.style.overflow = '';
-	playClick();
+
+playerName = val;
+document.getElementById('player-name').value = val;
+localStorage.setItem('pokemommy_trainer_name', val);
+document.getElementById('name-popup').style.display = 'none';
+document.body.style.overflow = '';
+playClick();
+initBgm();
 
 	const hadEgg = checkTrainerNameEgg(val);
 	if (hadEgg) {
@@ -161,6 +167,66 @@ function confirmTrainerName() {
 	} else {
 		setTimeout(checkNightMode, 300);
 	}
+}
+
+// ── SETTINGS PANEL ───────────────────────────────────────────────
+function openSettings() {
+  const ov = document.getElementById('settings-overlay');
+  // Sync sliders to current values
+  const sfxSlider   = document.getElementById('s-sfx-slider');
+  const musicSlider = document.getElementById('s-music-slider');
+  sfxSlider.value   = Math.round(sfxVolume * 100);
+  musicSlider.value = Math.round(musicVolume * 100);
+  sfxSlider.style.setProperty('--pct', sfxSlider.value + '%');
+  musicSlider.style.setProperty('--pct', musicSlider.value + '%');
+  document.getElementById('s-sfx-val').textContent   = sfxSlider.value + '%';
+  document.getElementById('s-music-val').textContent  = musicSlider.value + '%';
+  document.getElementById('s-sfx-card').classList.toggle('s-muted',   sfxVolume === 0);
+  document.getElementById('s-music-card').classList.toggle('s-muted', musicVolume === 0);
+  document.getElementById('s-auto-duck').checked = autoDuck;
+  document.querySelectorAll('.s-sprite-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.style === spriteStyle));
+  ov.classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function handleSettingsOverlayClick(e) {
+  if (e.target === document.getElementById('settings-overlay')) closeSettings();
+}
+
+let _sliderHintTimer = null;
+function onSettingsSlider(type, val) {
+  val = parseInt(val);
+  const pct = val + '%';
+  document.getElementById(`s-${type}-val`).textContent = pct;
+  document.getElementById(`s-${type}-slider`).style.setProperty('--pct', pct);
+  document.getElementById(`s-${type}-card`).classList.toggle('s-muted', val === 0);
+  if (type === 'sfx') {
+    sfxVolume = val / 100;
+    clearTimeout(_sliderHintTimer);
+    _sliderHintTimer = setTimeout(() => playHint(), 80);
+  } else {
+    musicVolume = val / 100;
+    applyBgmVolume();
+  }
+}
+
+function saveSettings() {
+  // Read sprite style
+  playClick(); 
+  const selected = document.querySelector('.s-sprite-btn.selected');
+  if (selected) spriteStyle = selected.dataset.style;
+  autoDuck = document.getElementById('s-auto-duck').checked;
+  // Persist
+  localStorage.setItem('pm_sfx_vol',      sfxVolume);
+  localStorage.setItem('pm_music_vol',    musicVolume);
+  localStorage.setItem('pm_sprite_style', spriteStyle);
+  localStorage.setItem('pm_auto_duck',    autoDuck);
+  applyBgmVolume();
+  closeSettings();
 }
 
 
@@ -1387,6 +1453,7 @@ async function preloadQuestionImages(startIdx, count) {
 }
 
 async function renderQuestion() {
+	duckBgm();
 	clearAutoNext();
 	preloadQuestionImages(currentQ + 1, 5);
 	const q = questions[currentQ];
@@ -1469,7 +1536,7 @@ function renderIdentifyQuestion(q) {
 	const total = q.options.length;
 
 	function onOneLoaded(img, spin) {
-		if (difficulty === 'hard') img.classList.add('silhouette');
+		
 		spin.style.display = 'none';
 		loadedCount++;
 		if (loadedCount === total) {
@@ -1486,6 +1553,7 @@ function renderIdentifyQuestion(q) {
 		const img = document.createElement('img');
 		img.alt = opt.name;
 		img.style.opacity = '0';
+		if (difficulty === 'hard') img.classList.add('silhouette');
 		img.onload = () => onOneLoaded(img, spin);
 		img.onerror = () => {
 			img.onerror = null;
@@ -1570,10 +1638,10 @@ function renderEvoQuestion(evoQ) {
 			const img2 = document.createElement('img');
 			img2.alt = opt.name;
 			img2.style.opacity = '0';
-			img2.onload = () => {
-				if (difficulty === 'hard') img2.classList.add('silhouette');
-				spin.style.display = 'none';
-				evoLoadedCount++;
+			if (difficulty === 'hard') img2.classList.add('silhouette');  // ← before src
+img2.onload = () => {
+  spin.style.display = 'none';
+  evoLoadedCount++;
 				if (evoLoadedCount >= evoTotal) grid.querySelectorAll('.evo-opt-btn img').forEach(i => i.style.opacity = '1');
 			};
 			img2.onerror = () => {
@@ -1970,7 +2038,8 @@ function learnNavigate(dir) {
 
 // ── Results ───────────────────────────────────────────────────────
 function showResults() {
-	stopTimer();
+unduckBgm();
+stopTimer();
 	const pct = answeredCount === 0 ? 0 : Math.round(correctCount / answeredCount * 100);
 	const tiers = [
 		[100, '🏆', 'Perfect score! True Pokémon Master!'],

@@ -164,9 +164,6 @@ function confirmTrainerName() {
 }
 
 
-
-
-
 // ════════════════════════════════════════════════════════════════
 // ── EASTER EGGS
 // ════════════════════════════════════════════════════════════════
@@ -710,93 +707,108 @@ window.addEventListener('load', () => {
 		const hint = document.getElementById('swipe-hint');
 		if (hint) hint.classList.add('hidden');
 	}
-	setTimeout(checkNightMode, 500);
 });
 
 // ── 2. Night mode ────────────────────────────────────────────────
 function checkNightMode() {
-	if (document.body.classList.contains('night-mode')) return;
-	const h = new Date().getHours();
-	if (h >= 23 || h < 4) {
-		const overlay = document.getElementById('easter-overlay');
-		if (!overlay) return;
-		playNightChime();
-		setTimeout(() => {
-			showEasterEgg('🌙', "Shouldn't you be asleep, Trainer?",
-				"It's late… but a true Pokémon Trainer never rests. Night mode activated. 🌟\n\nTake care of yourself - even Ash sleeps sometimes.");
+  if (document.body.classList.contains('night-mode')) return;
+  const h = new Date().getHours();
+  if (h >= 23 || h < 4) {
 
-			document.body.style.background = '#1a1a2e';
-			document.body.style.transition = 'background 1.5s ease';
-			document.querySelector('.card').style.background = '#16213e';
-			document.querySelector('.card').style.color = '#e0e0e0';
-			document.querySelector('.card').style.transition = 'background 1.5s ease, color 1.5s ease';
-			document.querySelector('.card').style.boxShadow = '0 8px 32px rgba(0,0,0,0.6)';
+    // ── Step 1: Play the chime immediately ────────────────────
+    playNightChime();
 
-			const stars = document.createElement('div');
-			stars.id = 'night-stars';
-			stars.setAttribute('style',
-				'position:fixed;inset:0;pointer-events:none;z-index:1;' +
-				'background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E' +
-				'%3Ccircle cx=\'20\' cy=\'30\' r=\'1\' fill=\'white\' opacity=\'0.6\'/%3E' +
-				'%3Ccircle cx=\'80\' cy=\'10\' r=\'1.5\' fill=\'white\' opacity=\'0.4\'/%3E' +
-				'%3Ccircle cx=\'150\' cy=\'50\' r=\'1\' fill=\'white\' opacity=\'0.7\'/%3E' +
-				'%3Ccircle cx=\'40\' cy=\'80\' r=\'1\' fill=\'white\' opacity=\'0.3\'/%3E' +
-				'%3Ccircle cx=\'120\' cy=\'90\' r=\'1.5\' fill=\'white\' opacity=\'0.5\'/%3E' +
-				'%3Ccircle cx=\'170\' cy=\'20\' r=\'1\' fill=\'white\' opacity=\'0.6\'/%3E' +
-				'%3Ccircle cx=\'60\' cy=\'150\' r=\'1\' fill=\'white\' opacity=\'0.4\'/%3E' +
-				'%3Ccircle cx=\'190\' cy=\'140\' r=\'1.5\' fill=\'white\' opacity=\'0.5\'/%3E' +
-				'%3C/svg%3E") repeat;opacity:0;transition:opacity 2s ease;'
-			);
-			document.body.appendChild(stars);
-			setTimeout(() => {
-				stars.style.opacity = '1';
-			}, 100);
+    // ── Step 2: Start the slow visual transition RIGHT NOW ────
+    // Player is on the landing screen — they can watch it darken
+    document.body.style.transition = 'background 1.8s ease';
+    document.body.style.background = '#1a1a2e';
 
-			// ── Only inject night styles when it's actually night ────
-			const style = document.createElement('style');
-			style.id = 'night-mode-styles';
-			style.textContent = `
-        body.night-mode, body.night-mode * {
-          --night-text: #e8e8e8;
-          --night-sub:  #aab4c8;
-          --night-blue: #7eb3f7;
-        }
-        #landing-screen h1, #welcome-screen h1, .qt-title,
-        .learn-detail-name, #lb-title { color: #7eb3f7 !important; -webkit-text-stroke: 0 !important; }
-        .qt-desc, .landing-subtitle, label, .learn-info-label, .learn-dex-entry,
-        .learn-category, .lc-name, .evo-mem-name, .result-msg,
-        .result-score-sub, .result-time, .feedback-msg, .top-bar,
-        .page-footer, .page-footer *, .lb-table td,
-        .lb-table th { color: #aab4c8 !important; }
-        #learn-category { color: #e8e8e8 !important; }
-        .entry-text { color: #e8e8e8 !important; }
-        .qt-title, #welcome-title, .learn-detail-num, .lc-num,
-        .evo-mem-num { color: #7eb3f7 !important; }
-        .quiz-type-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; }
-        .quiz-type-btn:hover { background: #2a3f6a !important; border-color: #7eb3f7 !important; }
-        .diff-btn, .toggle-btn, .learn-nav-btn, .learn-card {
-          background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important;
-        }
-        .diff-btn.selected, .toggle-btn.active { background: #3D7DCA !important; color: #fff !important; }
-        input[type="text"] { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
-        input[type="text"]::placeholder { color: #556a8a !important; }
-        .hint-card, .learn-info-card { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
-        .lb-table { background: transparent !important; }
-        .lb-table tr { background: #1e2d4a !important; }
-        .lb-table tr.lb-you { background: #2a3f6a !important; }
-        .lb-table th { background: #16213e !important; color: #7eb3f7 !important; }
-        .opt-btn, .img-opt-btn, .evo-opt-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
-        .opt-btn.correct, .img-opt-btn.correct, .evo-opt-btn.correct { background: #1a4a2a !important; border-color: #28a745 !important; }
-        .opt-btn.wrong, .img-opt-btn.wrong, .evo-opt-btn.wrong { background: #4a1a1a !important; border-color: #dc3545 !important; }
-        .progress-wrap { background: #2e4a7a !important; }
-        .gen-badge { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
-        .gen-badge.gen-active { background: #2a3f6a !important; border-color: #7eb3f7 !important; color: #7eb3f7 !important; }
-      `;
-			document.head.appendChild(style);
-			document.body.classList.add('night-mode');
+    const card = document.querySelector('.card');
+    if (card) {
+      card.style.transition = 'background 1.8s ease, color 1.8s ease, box-shadow 1.8s ease';
+      card.style.background = '#16213e';
+      card.style.color  = '#e0e0e0';
+      card.style.boxShadow = '0 8px 32px rgba(0,0,0,0.6)';
+    }
 
-		}, 500);
-	}
+    // ── Step 3: Inject night-mode class + styles mid-transition ──
+    // Do this at 1.4s so CSS overrides kick in as the fade is halfway done
+    setTimeout(() => {
+      if (!document.getElementById('night-mode-styles')) {
+        const style = document.createElement('style');
+        style.id = 'night-mode-styles';
+        style.textContent = `
+body.night-mode, body.night-mode * {
+  --night-text: #e8e8e8;
+  --night-sub: #aab4c8;
+  --night-blue: #7eb3f7;
+}
+#landing-screen h1, #welcome-screen h1, .qt-title,
+.learn-detail-name, #lb-title { color: #7eb3f7 !important; -webkit-text-stroke: 0 !important; }
+.qt-desc, .landing-subtitle, label, .learn-info-label, .learn-dex-entry,
+.learn-category, .lc-name, .evo-mem-name, .result-msg,
+.result-score-sub, .result-time, .feedback-msg, .top-bar,
+.page-footer, .page-footer *, .lb-table td,
+.lb-table th { color: #aab4c8 !important; }
+#learn-category { color: #e8e8e8 !important; }
+.entry-text { color: #e8e8e8 !important; }
+.qt-title, #welcome-title, .learn-detail-num, .lc-num,
+.evo-mem-num { color: #7eb3f7 !important; }
+.quiz-type-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; }
+.quiz-type-btn:hover { background: #2a3f6a !important; border-color: #7eb3f7 !important; }
+.diff-btn, .toggle-btn, .learn-nav-btn, .learn-card {
+  background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important;
+}
+.diff-btn.selected, .toggle-btn.active { background: #3D7DCA !important; color: #fff !important; }
+input[type="text"] { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
+input[type="text"]::placeholder { color: #556a8a !important; }
+.hint-card, .learn-info-card { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
+.lb-table { background: transparent !important; }
+.lb-table tr { background: #1e2d4a !important; }
+.lb-table tr.lb-you { background: #2a3f6a !important; }
+.lb-table th { background: #16213e !important; color: #7eb3f7 !important; }
+.opt-btn, .img-opt-btn, .evo-opt-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
+.opt-btn.correct, .img-opt-btn.correct, .evo-opt-btn.correct { background: #1a4a2a !important; border-color: #28a745 !important; }
+.opt-btn.wrong, .img-opt-btn.wrong, .evo-opt-btn.wrong { background: #4a1a1a !important; border-color: #dc3545 !important; }
+.progress-wrap { background: #2e4a7a !important; }
+.gen-badge { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
+.gen-badge.gen-active { background: #2a3f6a !important; border-color: #7eb3f7 !important; color: #7eb3f7 !important; }
+`;
+        document.head.appendChild(style);
+      }
+      document.body.classList.add('night-mode');
+    }, 800);
+
+    // ── Step 4: Stars fade in alongside the darkening ─────────
+    setTimeout(() => {
+      if (!document.getElementById('night-stars')) {
+        const stars = document.createElement('div');
+        stars.id = 'night-stars';
+        stars.setAttribute('style',
+          'position:fixed;inset:0;pointer-events:none;z-index:-1;' +
+          'background:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E' +
+          '%3Ccircle cx=\'20\' cy=\'30\' r=\'1\' fill=\'white\' opacity=\'0.6\'/%3E' +
+          '%3Ccircle cx=\'80\' cy=\'10\' r=\'1.5\' fill=\'white\' opacity=\'0.4\'/%3E' +
+          '%3Ccircle cx=\'150\' cy=\'50\' r=\'1\' fill=\'white\' opacity=\'0.7\'/%3E' +
+          '%3Ccircle cx=\'40\' cy=\'80\' r=\'1\' fill=\'white\' opacity=\'0.3\'/%3E' +
+          '%3Ccircle cx=\'120\' cy=\'90\' r=\'1.5\' fill=\'white\' opacity=\'0.5\'/%3E' +
+          '%3Ccircle cx=\'170\' cy=\'20\' r=\'1\' fill=\'white\' opacity=\'0.6\'/%3E' +
+          '%3Ccircle cx=\'60\' cy=\'150\' r=\'1\' fill=\'white\' opacity=\'0.4\'/%3E' +
+          '%3Ccircle cx=\'190\' cy=\'140\' r=\'1.5\' fill=\'white\' opacity=\'0.5\'/%3E' +
+          '%3C/svg%3E") repeat;opacity:0;transition:opacity 2s ease;'
+        );
+        document.body.appendChild(stars);
+        setTimeout(() => { stars.style.opacity = '1'; }, 100);
+      }
+    }, 1000);
+
+    // ── Step 5: Show the easter egg AFTER the transition is felt ──
+    // Player has had ~2.6s to watch the screen darken before the overlay appears
+    setTimeout(() => {
+      showEasterEgg('🌙', "Shouldn't you be asleep, Trainer?",
+        "It's late… but a true Pokémon Trainer never rests. \n\nTake care of yourself - even Ash sleeps sometimes.");
+    }, 1600);
+  }
 }
 
 // ── 3. Trainer name eggs ─────────────────────────────────────────

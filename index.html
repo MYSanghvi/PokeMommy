@@ -164,10 +164,10 @@
     <label>Quiz Mode</label>
     <div class="toggle-row">
       <button class="toggle-btn active" id="btn-quick" onclick="selectMode('quick')">
-        ⚡ Quick Test<br/><span style="font-size:9px;font-weight:400;">20 Questions</span>
+        Quick Test<br/><span style="font-size:11px;font-weight:400;">20 Questions</span>
       </button>
       <button class="toggle-btn" id="btn-full" onclick="selectMode('full')">
-        📖 Full Pokédex<br/><span style="font-size:9px;font-weight:400;">All 151</span>
+        Full Pokédex<br/><span style="font-size:11px;font-weight:400;">All 151</span>
       </button>
     </div>
     <label>Difficulty</label>
@@ -340,18 +340,18 @@
     <div class="s-chip-check"></div> Gen IV · Sinnoh
   </div>
 </div>
-    <div class="s-gen-note">ℹ️ These regions are still locked. New Pokémon will appear soon!</div>
+  <!--   <div class="s-gen-note">ℹ️ These regions are still locked. New Pokémon will appear soon!</div> -->
 
     <!-- Sound -->
     <div class="s-label">Sound</div>
     <div class="s-sound-row">
       <div class="s-sound-card" id="s-sfx-card">
-        <div class="s-sound-lbl">🔊 Battle SFX <span class="s-sound-val" id="s-sfx-val">70%</span></div>
+        <div class="s-sound-lbl">Sound Effects <span class="s-sound-val" id="s-sfx-val">70%</span></div>
         <input type="range" id="s-sfx-slider" min="0" max="100" value="70" style="--pct:70%"
                oninput="onSettingsSlider('sfx', this.value)">
       </div>
       <div class="s-sound-card" id="s-music-card">
-        <div class="s-sound-lbl">🎵 Route Music <span class="s-sound-val" id="s-music-val">50%</span></div>
+        <div class="s-sound-lbl">Background Music <span class="s-sound-val" id="s-music-val">50%</span></div>
         <input type="range" id="s-music-slider" min="0" max="100" value="50" style="--pct:50%"
                oninput="onSettingsSlider('music', this.value)">
       </div>

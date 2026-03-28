@@ -201,10 +201,11 @@ function renderLeaderboardTable() {
 // Filter to current quiz + difficulty + mode
 const currentMode = quizMode === 'full' ? 'Full Test' : 'Quick Test';
 let data = lbAllData.filter(r => {
-const rowMode = (r.mode && r.mode.trim() !== '') ? r.mode : 'Quick Test';
+const rowMode = (r.mode && String(r.mode).trim() !== '') 
+  ? String(r.mode).trim() 
+  : 'Quick Test';	
 return r.quiz === quizNames[quizType] &&
-r.difficulty &&
-r.difficulty.toLowerCase() === difficulty.toLowerCase() &&
+r.difficulty && String(r.difficulty).toLowerCase() === difficulty.toLowerCase()
 rowMode === currentMode;
 });
 
@@ -226,11 +227,9 @@ rowMode === currentMode;
   // Keep only each trainer's best attempt
 const bestByName = {};
 data.forEach(r => {
-const key = r.name.trim().toLowerCase();
+const key = String(r.name || '').trim().toLowerCase();
 const ex = bestByName[key];
-if (!ex ||
-    r._acc > ex._acc ||
-    (r._acc === ex._acc && timeToSeconds(r.time) < timeToSeconds(ex.time))) {
+if (key && (!ex || r.acc > ex.acc || (r.acc === ex.acc && timeToSeconds(r.time) < timeToSeconds(ex.time)))) {
   bestByName[key] = r;
 }
 });
@@ -296,8 +295,13 @@ function timeToSeconds(timeStr) {
   return m ? parseInt(m[1])*60 + parseInt(m[2]) + (parseInt(m[3]||'0')/10) : 99999;
 }
 function escHtml(str) {
-  if (!str) return '—';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function formatDate(val) {
   if (!val) return '—';

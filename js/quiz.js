@@ -1059,7 +1059,7 @@ window.addEventListener('load', () => {
 				playSecretJingle();
 				celebrationConfetti(100);
 				showEasterEgg('🏆', 'ACHIEVEMENT UNLOCKED: Obsessive Tapper',
-					"🌟 Incredible! You’ve unlocked a secret meant only for the most observant Trainers!");
+					"Incredible! You’ve unlocked a secret meant only for the most observant Trainers!");
 			}
 		});
 	}

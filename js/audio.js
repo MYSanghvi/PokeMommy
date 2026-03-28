@@ -111,9 +111,16 @@ function playNightChime() {
   [330,294,262].forEach((f,i) => tone(f,'sine',0.2,0.18,i*0.18));
 }
 
+function playWhosThatAudio() {
+    if (!soundOn) return;
+    whosThatAudio.volume = sfxVolume;   // ← links to SFX slider
+    whosThatAudio.currentTime = 0;
+    whosThatAudio.play().catch(() => {});
+}
+
 function stopWhosThatAudio() {
-  whosThatAudio.pause();
-  whosThatAudio.currentTime = 0;
+    whosThatAudio.pause();
+    whosThatAudio.currentTime = 0;
 }
 function toggleSound() {
   soundOn = !soundOn;

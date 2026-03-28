@@ -1502,8 +1502,7 @@ document.getElementById('learn-detail-screen').addEventListener('touchend', e =>
 function goToWelcome(type) {
 	playClick();
 	if (type === 'whos' && soundOn) {
-		whosThatAudio.currentTime = 0;
-		whosThatAudio.play().catch(() => {});
+		playWhosThatAudio();
 	}
 	quizType = type;
 	difficulty = null;
@@ -1761,7 +1760,11 @@ async function renderQuestion() {
 		b.disabled = i !== 1;
 	});
 	document.getElementById('feedback-msg').textContent = '';
-	document.getElementById('next-btn').style.display = 'none';
+	const _nxt = document.getElementById('next-btn');
+_nxt.style.display = 'block';
+_nxt.disabled = true;
+_nxt.style.opacity = '0.4';
+_nxt.style.cursor = 'not-allowed';
 	document.getElementById('progress-fill').style.width = (currentQ / questions.length * 100) + '%';
 	document.getElementById('q-num').textContent = currentQ + 1;
 	updateAccuracy();
@@ -2019,6 +2022,9 @@ function checkAnswer(type, chosen, correct, btn) {
 	updateAccuracy();
 	const nxt = document.getElementById('next-btn');
 	nxt.style.display = 'block';
+	nxt.disabled = false;
+	nxt.style.opacity = '';
+	nxt.style.cursor = '';
 	startAutoNext(currentQ >= questions.length - 1);
 }
 
@@ -2055,6 +2061,9 @@ function checkEvoAnswer(btn, evoQ, choseNone, chosenName) {
 	updateAccuracy();
 	const nxt = document.getElementById('next-btn');
 	nxt.style.display = 'block';
+	nxt.disabled = false;
+	nxt.style.opacity = '';
+	nxt.style.cursor = '';
 	startAutoNext(currentQ >= questions.length - 1);
 }
 
@@ -2364,6 +2373,7 @@ stopTimer();
 		stopResultAudio();
 		const soundFile = pct === 100 ? 'champion-sound' : pct >= 50 ? 'win-sound' : 'lose-sound';
 		resultAudio = new Audio(`sounds/${soundFile}.mp3`);
+		resultAudio.volume = sfxVolume;   // ← add this line
 		resultAudio.play().catch(() => {});
 	}
 	submitScore(pct);
@@ -2390,29 +2400,45 @@ function nextQuestion() {
 }
 
 function confirmReset() {
-  if (confirm('Restart from Question 1? Your progress will be lost.')) {
-    playClick();
-    stopTimer();
-    clearAutoNext();
-    currentQ = 0; correctCount = 0; answeredCount = 0;
-    hintsRevealed = 0;
-    startGame();
-  }
+    const gs = document.getElementById('game-screen');
+    gs.style.filter = 'blur(20px) brightness(0.1)';
+	gs.style.pointerEvents = 'none';
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+        const ok = confirm('Restart from Question 1? Your progress will be lost.');
+        gs.style.filter = '';
+        gs.style.pointerEvents = '';
+        if (ok) {
+            playClick();
+            stopTimer();
+            clearAutoNext();
+            currentQ = 0; correctCount = 0; answeredCount = 0;
+            hintsRevealed = 0;
+            startGame();
+        }
+    }));
 }
 
 function confirmGoHome() {
-  if (confirm('Your progress will be lost. Are you sure you want to start the quiz again?')) {
-    playClick();
-    stopTimer();
-    clearAutoNext();
-    currentQ = 0; correctCount = 0; answeredCount = 0;
-    difficulty = null;
-    document.getElementById('btn-easy').classList.remove('selected');
-    document.getElementById('btn-hard').classList.remove('selected');
-    document.getElementById('start-btn').disabled = true;
-    checkReady();
-    showScreen('welcome-screen');
-  }
+    const gs = document.getElementById('game-screen');
+    gs.style.filter = 'blur(20px) brightness(0.1)';
+	gs.style.pointerEvents = 'none';
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+        const ok = confirm('Your progress will be lost. Are you sure you want to start the quiz again?');
+        gs.style.filter = '';
+        gs.style.pointerEvents = '';
+        if (ok) {
+            playClick();
+            stopTimer();
+            clearAutoNext();
+            currentQ = 0; correctCount = 0; answeredCount = 0;
+            difficulty = null;
+            document.getElementById('btn-easy').classList.remove('selected');
+            document.getElementById('btn-hard').classList.remove('selected');
+            document.getElementById('start-btn').disabled = true;
+            checkReady();
+            showScreen('welcome-screen');
+        }
+    }));
 }
 
 function restartGame() {
@@ -2482,7 +2508,8 @@ function celebrationConfetti(pct) {
 
 // ── Enter key support ────────────────────────────────────────────
 document.addEventListener('keydown', (e) => {
-	if (e.key !== 'Enter') return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.key === ' ') e.preventDefault();
 
 	// Don't fire while user is typing in the name field
 	const tag = document.activeElement?.tagName;

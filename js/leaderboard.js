@@ -53,7 +53,8 @@ function showResults() {
     stopResultAudio();
     const soundFile = pct===100?'champion-sound': pct>=50?'win-sound':'lose-sound';
     resultAudio = new Audio(`sounds/${soundFile}.mp3`);
-    resultAudio.play().catch(()=>{});
+    resultAudio.volume = sfxVolume;
+	resultAudio.play().catch(()=>{});
   }
 
   submitScore(pct);

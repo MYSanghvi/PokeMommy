@@ -34,8 +34,14 @@ A Pokémon sprite is shown. Pick the correct name from 4 choices. On Hard mode, 
 - **3-tier hint system** — Category → Type → Pokédex Entry
 - **Auto-advance** — next question loads after 5 seconds
 - **Leaderboard** — scores saved and ranked by accuracy and time
-- **Sound & vibration** — audio feedback for correct, wrong, hints, and results
+- **Sound & Vibration** — audio feedback for correct, wrong, hints, and results
 - **Mobile-friendly** — swipe to navigate the Pokédex on touch devices
+
+## Goal
+
+Step 1: Teach wife Pokémon.  
+Step 2: Teach baby Pokémon.  
+Step 3: Complete the Pokédex as a family.
 
 ## Easter Eggs
 
@@ -45,15 +51,8 @@ There are 6 hidden easter eggs in the game. Finding them all is part of the jour
 
 Created by a fellow Pokémon Trainer starting a new journey.
 Made for my expecting wife and our future little Pokémon Trainer.
-Pokémon sprites by TilableToast / FurretTurret. (https://github.com/Nackha1/Hd-sprites)
 
 ## Disclaimer
 
 Pokémon and all respective names are trademarks and © of Nintendo, Game Freak, and Creatures Inc.  
 This is a non-commercial fan project and is not affiliated with or endorsed by The Pokémon Company.
-
-## Goal
-
-Step 1: Teach wife Pokémon.  
-Step 2: Teach baby Pokémon.  
-Step 3: Complete the Pokédex as a family.

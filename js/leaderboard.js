@@ -193,37 +193,37 @@ async function fetchLeaderboard() {
 // ── Render ────────────────────────────────────────────────────────
 function renderLeaderboardTable() {
   const wrap = document.getElementById('lb-table-wrap');
-  const quizNames={
-    whos:"Who's That Pokémon?",
-    identify:'Identify the Pokémon',
-    evo:'Spot the Evolution'
+  const quizNames = {
+    whos: "Who's That Pokémon?",
+    identify: 'Identify the Pokémon',
+    evo: 'Spot the Evolution'
   };
 
-// Filter to current quiz + difficulty + mode
-const currentMode = quizMode === 'full' ? 'Full Test' : 'Quick Test';
-let data = lbAllData.filter(r => {
-const rowMode = (r.mode && String(r.mode).trim() !== '') 
-  ? String(r.mode).trim() 
-  : 'Quick Test';	
-return r.quiz === quizNames[quizType] &&
-r.difficulty && String(r.difficulty).toLowerCase() === difficulty.toLowerCase()
-rowMode === currentMode;
-});
+  // Filter to current quiz + difficulty + mode
+  const currentMode = quizMode === 'full' ? 'Full Test' : 'Quick Test';
+  let data = lbAllData.filter(r => {
+    const rowMode = (r.mode && String(r.mode).trim() !== '')
+      ? String(r.mode).trim()
+      : 'Quick Test';
+    return r.quiz === quizNames[quizType] &&
+      r.difficulty && String(r.difficulty).toLowerCase() === difficulty.toLowerCase() &&
+      rowMode === currentMode;
+  });
 
-  // ── Normalise accuracy to 0–100 integer ──────────────────────
+  // Normalise accuracy to 0–100 integer
   // Handles "85%" (string), 0.85 (decimal float), 85 (integer)
   data = data.map(r => {
-  let acc = r.accuracy;
-  if (typeof acc === 'string') {
-    acc = parseFloat(acc.replace('%',''));
-  } else if (typeof acc === 'number' && acc > 0 && acc <= 1) {
-    acc = Math.round(acc * 100);
-  } else {
-    acc = Math.round(Number(acc));
-  }
-  if (isNaN(acc)) acc = 0;
-  return { ...r, _acc: acc };
-});
+    let acc = r.accuracy;
+    if (typeof acc === 'string') {
+      acc = parseFloat(acc.replace('%', ''));
+    } else if (typeof acc === 'number' && acc > 0 && acc <= 1) {
+      acc = Math.round(acc * 100);
+    } else {
+      acc = Math.round(Number(acc));
+    }
+    if (isNaN(acc)) acc = 0;
+    return { ...r, _acc: acc };
+  });
 
   // Keep only each trainer's best attempt
   const bestByName = {};
@@ -234,13 +234,13 @@ rowMode === currentMode;
       bestByName[key] = r;
     }
   });
-data = Object.values(bestByName);
+  data = Object.values(bestByName);
 
-// Sort: accuracy desc, then time asc
-data.sort((a,b) => {
-if (b._acc !== a._acc) return b._acc - a._acc;
-return timeToSeconds(a.time) - timeToSeconds(b.time);
-});
+  // Sort: accuracy desc, then time asc
+  data.sort((a, b) => {
+    if (b._acc !== a._acc) return b._acc - a._acc;
+    return timeToSeconds(a.time) - timeToSeconds(b.time);
+  });
 
   data = data.slice(0, 50);
 
@@ -256,13 +256,20 @@ return timeToSeconds(a.time) - timeToSeconds(b.time);
     return;
   }
 
-  const medals = ['🥇','🥈','🥉'];
-  const rows = data.map((r,i) => {
-const isYou = String(r.sessionid) === sessionId
-  || String(r.name).trim().toLowerCase() === String(playerName).trim().toLowerCase();
-const rank = i < 3 ? medals[i] : `#${i+1}`;
-const rankClass = i < 3 ? `lb-rank lb-rank-${i+1}` : 'lb-rank';
-const youBadge = isYou ? ' <span style="background:#3D7DCA;color:#fff;font-size:9px;padding:1px 5px;border-radius:99px;font-family:Roboto,sans-serif;vertical-align:middle;">YOU</span>' : '';
+  const medals = ['🥇', '🥈', '🥉'];
+  const rows = data.map((r, i) => {
+    const isMyName   = String(r.name || '').trim().toLowerCase() === String(playerName).trim().toLowerCase();
+    const isCurrentSession = String(r.sessionid) === sessionId;
+    const isYou      = isMyName;
+
+    const rank      = i < 3 ? medals[i] : `#${i + 1}`;
+    const rankClass = i < 3 ? `lb-rank lb-rank-${i + 1}` : 'lb-rank';
+
+    const badgeLabel = isMyName ? (isCurrentSession ? 'YOU' : 'YOUR BEST') : null;
+    const youBadge   = badgeLabel
+      ? ` <span style="background:${isCurrentSession ? '#3D7DCA' : '#888'};color:#fff;font-size:9px;padding:1px 5px;border-radius:99px;font-family:Roboto,sans-serif;vertical-align:middle;">${badgeLabel}</span>`
+      : '';
+
     return `<tr class="${isYou ? 'lb-you' : ''}" ${isYou ? 'id="lb-you-row"' : ''}>
   <td><span class="${rankClass}">${rank}</span></td>
   <td>${escHtml(r.name)}${youBadge}</td>

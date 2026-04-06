@@ -1114,3 +1114,179 @@ body.night-mode .qt-coming-soon-badge {
 }
 
 /* ══════════ END HELU ══════════ */
+
+
+/* ── QUESTION TRANSITION ──────────────────────────────────────── */
+@keyframes q-fade-slide {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.q-entering {
+  animation: q-fade-slide 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+
+
+/* ── SETTINGS CLOSE BUTTON ───────────────────────────────────── */
+.s-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.s-title-row .s-title {
+  margin-bottom: 0;
+}
+.s-close-btn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.s-close-btn:hover {
+  background: #e0e0e0;
+  color: #222;
+}
+body.night-mode .s-close-btn {
+  background: #2e4a7a;
+  color: #aab4c8;
+}
+body.night-mode .s-close-btn:hover {
+  background: #3d5f99;
+  color: #fff;
+}
+
+
+/* ── WRONG ANSWER REVIEW ─────────────────────────────────────────── */
+#review-section {
+  margin-top: 24px;
+  border-top: 2px solid #f0f0f0;
+  padding-top: 18px;
+}
+.review-title {
+  font-family: Flexo, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #003A70;
+  margin-bottom: 14px;
+  text-align: left;
+}
+.review-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f9f9f9;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.review-img-wrap {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.review-img-wrap img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.review-info {
+  flex: 1;
+  min-width: 0;
+}
+.review-question {
+  font-family: Flexo, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.review-correct {
+  font-family: Roboto, sans-serif;
+  font-size: 13px;
+  color: #155724;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.review-wrong {
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  color: #721c24;
+}
+
+/* Night mode overrides */
+body.night-mode .review-card {
+  background: #1e2d4a !important;
+  border-color: #2e4a7a !important;
+}
+body.night-mode .review-title { color: #7eb3f7 !important; }
+body.night-mode .review-question { color: #aab4c8 !important; }
+body.night-mode .review-correct { color: #6fcf97 !important; }
+body.night-mode .review-wrong   { color: #eb9898 !important; }
+body.night-mode .review-img-wrap { background: #2e4a7a !important; }
+body.night-mode #review-section { border-top-color: #2e4a7a !important; }
+
+/* ── LOADING SKELETON ──────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.img-skeleton {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #e8eef6 25%, #d0d8ea 50%, #e8eef6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+body.night-mode .img-skeleton {
+  background: linear-gradient(90deg, #1e2d4a 25%, #2a3f6a 50%, #1e2d4a 75%);
+  background-size: 800px 100%;
+}
+/* Wrappers must be position:relative for skeleton to anchor */
+.pokemon-img-wrap,
+.evo-question-img-wrap {
+  position: relative;
+}
+
+/* ── SHARE BUTTON ──────────────────────────────────────────────── */
+.share-btn {
+  background: transparent;
+  color: #3D7DCA;
+  border: 2px solid #3D7DCA;
+  border-radius: 10px;
+  padding: 11px 28px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: Flexo, sans-serif;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.share-btn:hover  { background: #eef4fc; }
+.share-btn:active { transform: scale(0.97); }
+body.night-mode .share-btn          { color: #7eb3f7; border-color: #7eb3f7; }
+body.night-mode .share-btn:hover    { background: #1e2d4a; }

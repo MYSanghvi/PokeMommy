@@ -13,21 +13,51 @@ let autoDuck    = localStorage.getItem('pm_auto_duck') !== 'false';
 let bgmAudio = null;
 
 function initBgm() {
-  if (bgmAudio) return;
+  if (bgmAudio) {
+    if (bgmAudio.paused && soundOn && musicVolume > 0) {
+      bgmAudio.play().catch(() => {});
+    }
+    return;
+  }
   bgmAudio = new Audio('sounds/littleroot_town.mp3');
   bgmAudio.loop = true;
   bgmAudio.volume = soundOn ? musicVolume : 0;
   bgmAudio.play().catch(() => {});
 }
+
 function applyBgmVolume() {
   if (!bgmAudio) return;
   bgmAudio.volume = soundOn ? musicVolume : 0;
 }
+
 function duckBgm() {
-  if (!bgmAudio || !autoDuck || musicVolume === 0) return;  // ← add musicVolume === 0
+  if (!bgmAudio || !autoDuck || musicVolume === 0) return;
+  if (_unduckTimer) { clearInterval(_unduckTimer); _unduckTimer = null; }
   bgmAudio.volume = soundOn ? musicVolume * 0.2 : 0;
 }
-function unduckBgm() { applyBgmVolume(); }
+
+let _unduckTimer = null;
+function unduckBgm() {
+  if (!bgmAudio) return;
+  if (_unduckTimer) { clearInterval(_unduckTimer); _unduckTimer = null; }
+  const target = soundOn ? musicVolume : 0;
+  if (bgmAudio.volume === target) return;     // already at target, skip fade
+  const start  = bgmAudio.volume;
+  const STEPS  = 25;
+  const PERIOD = 600 / STEPS;                // 600 ms smooth fade-up
+  let step = 0;
+  _unduckTimer = setInterval(() => {
+    step++;
+    const t = step / STEPS;
+    // ease-out curve: feels natural
+    bgmAudio.volume = Math.min(start + (target - start) * (1 - Math.pow(1 - t, 2)), 1);
+    if (step >= STEPS) {
+      clearInterval(_unduckTimer);
+      _unduckTimer = null;
+      bgmAudio.volume = target; // guarantee exact final value
+    }
+  }, PERIOD);
+}
 // ── SETTINGS ─────────────────────────────────────────────────────
 
 

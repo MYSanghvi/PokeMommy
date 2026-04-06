@@ -88,6 +88,7 @@ let elapsedSeconds = 0,
 const QUICK_COUNT = 20;
 let sessionId = '';
 let resultAudio = null;
+let wrongAnswers = [];
 
 
 // ════════════════════════════════════════════════════════════════
@@ -1724,10 +1725,10 @@ function goToWelcome(type) {
 	document.getElementById('btn-quick').classList.add('active');
 	document.getElementById('btn-full').classList.remove('active');
 	const titles = {
-		whos: ["Who's That Pokémon?", 'Full sprite shown', 'Silhouette only'],
-		identify: ["Identify the Pokémon", 'Clear images shown', 'Silhouettes shown'],
-		evo: ["Spot the Evolution", 'Clear images shown', 'Silhouettes shown']
-	};
+  whos:     ["Who's That Pokémon?",  "Full sprite shown",              "Silhouette only"],
+  identify: ["Identify the Pokémon", "Name shown, pick the image",     "Name shown, pick the silhouette"],
+  evo:      ["Spot the Evolution",   "Pick evolution with clear images",  "Pick evolution with silhouettes"]
+};
 	const [title, easyD, hardD] = titles[type];
 	document.getElementById('welcome-title').textContent = title;
 	document.getElementById('easy-desc').textContent = easyD;
@@ -1741,6 +1742,7 @@ function goHome() {
 	stopResultAudio();
 	stopWhosThatAudio();
 	clearAutoNext();
+	unduckBgm();
 	if (timerInterval) {
 		clearInterval(timerInterval);
 		timerInterval = null;
@@ -1780,19 +1782,17 @@ function checkReady() {
 }
 
 async function loadPokemonList() {
-	try {
-		const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-		if (!res.ok) throw new Error('API error');
-		const data = await res.json();
-		allPokemon = data.results.map((p, i) => ({
-			id: i + 1,
-			name: p.name
-		}));
-	} catch (e) {
-		alert('⚠️ Could not load Pokémon data. Please check your connection and refresh.');
-		document.getElementById('start-btn').disabled = false;
-		document.getElementById('start-btn').textContent = 'Start Quiz!';
-	}
+  try {
+    const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    allPokemon = data.results.map((p, i) => ({ id: i + 1, name: p.name }));
+  } catch(e) {
+    showToast("⚠️ Couldn't reach Professor Oak's lab. Check your connection and try again!");
+    const btn = document.getElementById('start-btn');
+    btn.disabled = false;
+    btn.textContent = 'Try Again';
+  }
 }
 
 async function getEvolutionChain(pokemonId) {
@@ -1909,6 +1909,7 @@ async function startGame() {
 	currentQ = 0;
 	correctCount = 0;
 	answeredCount = 0;
+	wrongAnswers = [];
 	document.getElementById('q-total').textContent = questions.length;
 	document.getElementById('player-display').textContent = playerName;
 	const genderImg = document.getElementById('trainer-gender-img');
@@ -1985,11 +1986,12 @@ _nxt.style.cursor = 'not-allowed';
 	} else if (quizType === 'identify') {
 		if (!q.options) q.options = await buildOptions(q.correct);
 		renderIdentifyQuestion(q);
-	} else {
-		if (!q.evoQ) q.evoQ = await buildEvoQuestion(q.correct);
-		if (!q.evoQ.options) q.evoQ.options = buildEvoOptions(q.evoQ);
-		renderEvoQuestion(q.evoQ);
-	}
+	  } else {
+    if (!q.evoQ) q.evoQ = await buildEvoQuestion(q.correct);
+    if (!q.evoQ.options) q.evoQ.options = buildEvoOptions(q.evoQ);
+    renderEvoQuestion(q.evoQ);
+  }
+  animateQuestionIn();
 }
 
 function renderWhosQuestion(q) {
@@ -1998,8 +2000,10 @@ function renderWhosQuestion(q) {
 
 	document.getElementById('options-grid').innerHTML = '';
 
-	img.style.opacity = '0';
-	spn.style.display = 'block';
+  img.style.opacity = 0;
+  spn.style.display = 'block';
+  const whosSk = document.getElementById('whos-skeleton');
+  if (whosSk) whosSk.style.opacity = '1';
 
 	// ⭐ CRITICAL: reset FIRST
 	img.classList.remove('silhouette');
@@ -2009,11 +2013,13 @@ function renderWhosQuestion(q) {
 		img.classList.add('silhouette');
 	}
 
-	img.onload = () => {
-		spn.style.display = 'none';
-		img.style.opacity = '1';
-		preloadNext();
-	};
+	  img.onload = () => {
+    spn.style.display = 'none';
+    img.style.opacity = 1;
+    const sk = document.getElementById('whos-skeleton');
+    if (sk) sk.style.opacity = '0';
+    preloadNext();
+  }
 
 	img.onerror = () => {
 		img.onerror = null;
@@ -2078,19 +2084,32 @@ function renderIdentifyQuestion(q) {
 }
 
 function renderEvoQuestion(evoQ) {
-	const img = document.getElementById('evo-pokemon-img'),
-		spn = document.getElementById('evo-spinner');
-	img.style.opacity = '0';
-	spn.style.display = 'block';
-	img.onload = () => {
-		spn.style.display = 'none';
-		img.style.opacity = '1';
-	};
-	img.onerror = () => {
-		img.onerror = null;
-		img.src = fallbackUrl(evoQ.subject.id);
-	};
-	img.src = gifUrl(evoQ.subject.name);
+  const img = document.getElementById('evo-pokemon-img'), spn = document.getElementById('evo-spinner');
+  img.style.opacity = 0;
+  spn.style.display = 'block';
+  const evoSk = document.getElementById('evo-skeleton');
+  if (evoSk) evoSk.style.opacity = '1';
+
+  // Three gates: subject loaded, all options loaded, minimum read-delay elapsed
+  let subjectReady = false, optionsReady = false, minDelayDone = false;
+  const tryRevealOptions = () => {
+    if (subjectReady && optionsReady && minDelayDone) {
+      document.getElementById('evo-options-grid')
+        .querySelectorAll('.evo-opt-btn img')
+        .forEach(i => { i.style.opacity = 1; });
+    }
+  };
+  setTimeout(() => { minDelayDone = true; tryRevealOptions(); }, 380);
+
+  img.onload = () => {
+  spn.style.display = 'none';
+  img.style.opacity = 1; 
+  if (evoSk) evoSk.style.opacity = 0;
+  subjectReady = true;
+  tryRevealOptions();                     
+};
+  img.onerror = () => { img.onerror = null; img.src = fallbackUrl(evoQ.subject.id); }
+  img.src = gifUrl(evoQ.subject.name);
 	const visualRow = document.getElementById('evo-visual-row');
 	const subjectWrap = document.getElementById('evo-question-img-wrap');
 	visualRow.innerHTML = '';
@@ -2148,17 +2167,16 @@ function renderEvoQuestion(evoQ) {
 			img2.alt = opt.name;
 			img2.style.opacity = '0';
 			if (difficulty === 'hard') img2.classList.add('silhouette');  // ← before src
-img2.onload = () => {
-  spin.style.display = 'none';
-  evoLoadedCount++;
-				if (evoLoadedCount >= evoTotal) grid.querySelectorAll('.evo-opt-btn img').forEach(i => i.style.opacity = '1');
-			};
-			img2.onerror = () => {
-				img2.onerror = null;
-				img2.src = fallbackUrl(opt.id);
-				evoLoadedCount++;
-				if (evoLoadedCount >= evoTotal) grid.querySelectorAll('.evo-opt-btn img').forEach(i => i.style.opacity = '1');
-			};
+        img2.onload = () => {
+          spin.style.display = 'none';
+          evoLoadedCount++;
+          if (evoLoadedCount >= evoTotal) { optionsReady = true; tryRevealOptions(); }
+        };
+        img2.onerror = () => {
+          img2.onerror = null; img2.src = fallbackUrl(opt.id);
+          evoLoadedCount++;
+          if (evoLoadedCount >= evoTotal) { optionsReady = true; tryRevealOptions(); }
+        };
 			img2.src = gifUrl(opt.name);
 			const cap = document.createElement('div');
 			cap.className = 'evo-caption';
@@ -2172,6 +2190,19 @@ img2.onload = () => {
 		grid.appendChild(btn);
 	});
 }
+
+
+function animateQuestionIn() {
+  const sectionId = quizType === 'whos'     ? 'whos-section'
+                  : quizType === 'identify' ? 'identify-section'
+                  : 'evo-section';
+  const el = document.getElementById(sectionId);
+  if (!el) return;
+  el.classList.remove('q-entering');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('q-entering');
+}
+
 
 function clearAutoNext() {
 	if (autoNextTimer) {
@@ -2199,44 +2230,52 @@ function startAutoNext(isLast) {
 }
 
 function checkAnswer(type, chosen, correct, btn) {
-	if (type === 'whos') {
-		document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
-		document.getElementById('pokemon-img').className = '';
-	} else {
-		document.querySelectorAll('.img-opt-btn').forEach(b => {
-			b.disabled = true;
-			const i = b.querySelector('img');
-			if (i) i.classList.remove('silhouette');
-		});
-	}
-	[1, 2, 3].forEach(i => document.getElementById(`hint-btn-${i}`).disabled = true);
-	answeredCount++;
-	const fb = document.getElementById('feedback-msg');
-	if (chosen === correct) {
-		correctCount++;
-		btn.classList.add('correct');
-		fb.textContent = `✅ Correct! It's ${displayName(correct)}!`;
-		fb.style.color = '#28a745';
-		playCorrect();
-	} else {
-		btn.classList.add('wrong');
-		if (type === 'whos') document.querySelectorAll('.opt-btn').forEach(b => {
-			if (b.textContent === displayName(correct)) b.classList.add('correct');
-		});
-		else document.querySelectorAll('.img-opt-btn').forEach(b => {
-			if (b.dataset.name === correct) b.classList.add('correct');
-		});
-		fb.textContent = `❌ It was ${displayName(correct)}!`;
-		fb.style.color = '#dc3545';
-		playWrong();
-	}
-	updateAccuracy();
-	const nxt = document.getElementById('next-btn');
-	nxt.style.display = 'block';
-	nxt.disabled = false;
-	nxt.style.opacity = '';
-	nxt.style.cursor = '';
-	startAutoNext(currentQ >= questions.length - 1);
+  if (type === 'whos') {
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    document.getElementById('pokemon-img').className = '';
+  } else {
+    document.querySelectorAll('.img-opt-btn').forEach(b => {
+      b.disabled = true;
+      const i = b.querySelector('img');
+      if (i) i.classList.remove('silhouette');
+    });
+  }
+  [1, 2, 3].forEach(i => document.getElementById(`hint-btn-${i}`).disabled = true);
+  answeredCount++;
+  const fb = document.getElementById('feedback-msg');
+  if (chosen === correct) {
+    correctCount++;
+    btn.classList.add('correct');
+    fb.textContent = `✅ Correct! It's ${displayName(correct)}!`;
+    fb.style.color = '#28a745';
+    playCorrect();
+  } else {
+    // ── Record mistake ──────────────────────────────────────────
+    wrongAnswers.push({
+      correctName: correct,
+      correctId:   questions[currentQ].correct.id,
+      chosenName:  chosen !== correct ? chosen : null,
+      quizType:    type
+    });
+    // ────────────────────────────────────────────────────────────
+    btn.classList.add('wrong');
+    if (type === 'whos') document.querySelectorAll('.opt-btn').forEach(b => {
+      if (b.textContent === displayName(correct)) b.classList.add('correct');
+    });
+    else document.querySelectorAll('.img-opt-btn').forEach(b => {
+      if (b.dataset.name === correct) b.classList.add('correct');
+    });
+    fb.textContent = `❌ It was ${displayName(correct)}!`;
+    fb.style.color = '#dc3545';
+    playWrong();
+  }
+  updateAccuracy();
+  const nxt = document.getElementById('next-btn');
+  nxt.style.display = 'block';
+  nxt.disabled = false;
+  nxt.style.opacity = '';
+  nxt.style.cursor = '';
+  startAutoNext(currentQ >= questions.length - 1);
 }
 
 function checkEvoAnswer(btn, evoQ, choseNone, chosenName) {
@@ -2258,9 +2297,18 @@ function checkEvoAnswer(btn, evoQ, choseNone, chosenName) {
 		fb.textContent = `✅ Correct! ${msg}`;
 		fb.style.color = '#28a745';
 		playCorrect();
-	} else {
-		btn.classList.add('wrong');
-		document.querySelectorAll('.evo-opt-btn').forEach(b => {
+	  } else {
+    wrongAnswers.push({
+      correctName: evoQ.answerIsNone ? '(no evolution)' : evoQ.answer?.name,
+      correctId: evoQ.answerIsNone ? null : evoQ.answer?.id,
+      chosenName: choseNone ? '(none)' : chosenName,
+      quizType: 'evo',
+      subjectName: evoQ.subject.name,
+      subjectId: evoQ.subject.id,
+      direction: evoQ.direction
+    });
+    btn.classList.add('wrong');
+    document.querySelectorAll('.evo-opt-btn').forEach(b => {
 			if (evoQ.answerIsNone && b.dataset.isNone) b.classList.add('correct');
 			else if (!evoQ.answerIsNone && b.dataset.name === evoQ.answer?.name) b.classList.add('correct');
 		});
@@ -2375,12 +2423,23 @@ async function openLearnDetail(pokemonId, fromBrowse = true) {
 	document.getElementById('learn-nav-prev').disabled = pokemonId === 1;
 	document.getElementById('learn-nav-next').disabled = pokemonId === 151;
 	showScreen('learn-detail-screen');
-	const [pr, sr] = await Promise.all([
-		fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`),
-		fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
-	]);
-	const pokeData = await pr.json(),
-		specData = await sr.json();
+	let pokeData, specData;
+try {
+  const [pr, sr] = await Promise.all([
+    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`),
+    fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
+  ]);
+  if (!pr.ok || !sr.ok) throw new Error('API error');
+  pokeData = await pr.json();
+  specData = await sr.json();
+} catch(e) {
+  document.getElementById('learn-spinner').style.display = 'none';
+  document.getElementById('learn-dex-entry').textContent =
+    "⚠️ Couldn't reach Professor Oak's lab — check your connection.";
+  showToast("⚠️ Couldn't load Pokémon data. Check your connection!");
+  return;
+}
+	
 	const p = allPokemon.find(x => x.id === pokemonId);
 	sprite.onload = () => {
 		spn.style.display = 'none';
@@ -2556,7 +2615,6 @@ function learnNavigate(dir) {
 
 // ── Results ───────────────────────────────────────────────────────
 function showResults() {
-unduckBgm();
 stopTimer();
 	const pct = answeredCount === 0 ? 0 : Math.round(correctCount / answeredCount * 100);
 	const tiers = [
@@ -2587,8 +2645,113 @@ stopTimer();
 		resultAudio.volume = sfxVolume;   // ← add this line
 		resultAudio.play().catch(() => {});
 	}
-	submitScore(pct);
+	  submitScore(pct);
+  renderWrongAnswerReview();;
 }
+
+function shareScore() {
+  playClick();
+  const pct    = parseInt(document.getElementById('result-pct').textContent);
+  const name   = playerName || 'A Trainer';
+  const mode   = quizMode === 'full' ? 'Full Pokédex' : 'Quick Test';
+  const diff   = difficulty === 'hard' ? 'Hard 🕶️' : 'Easy';
+  const typeLabel = quizType === 'whos'     ? "Who's That Pokémon? 🎯"
+                  : quizType === 'identify' ? 'Identify the Pokémon 🔍'
+                  : 'Spot the Evolution ⚡';
+  const medal  = pct === 100 ? '🏆 PERFECT SCORE!' : pct >= 80 ? '⭐ Great score!' : pct >= 60 ? '👍 Not bad!' : '💪 Keep training!';
+  const wrongs = wrongAnswers.length;
+  const wrongLine = wrongs === 0 ? 'Zero mistakes — true Pokémon Master! 🌟' : `Got ${wrongs} wrong — can you do better?`;
+
+  const text = [
+    `${medal}`,
+    `${name} scored ${pct}% on PokéMommy!`,
+    `📋 ${typeLabel} | ${mode} | ${diff}`,
+    wrongLine,
+    `🎮 Try it yourself → ${window.location.href}`
+  ].join('\n');
+
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text)
+      .then(()  => showToast('Score copied to clipboard! 📋 Paste it anywhere.'))
+      .catch(()  => showToast('Share: ' + pct + '% on PokéMommy! 🎉'));
+  }
+}
+
+
+function renderWrongAnswerReview() {
+  const section = document.getElementById('review-section');
+  section.innerHTML = '';
+  if (wrongAnswers.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  const title = document.createElement('div');
+  title.className = 'review-title';
+  title.textContent = `Review Mistakes (${wrongAnswers.length})`;
+  section.appendChild(title);
+
+  wrongAnswers.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+
+    // Sprite
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'review-img-wrap';
+    const img = document.createElement('img');
+    img.className = 'review-sprite';
+    if (w.quizType === 'evo') {
+      // show subject for evo questions
+      img.src = gifUrl(w.subjectName);
+      img.onerror = () => { img.onerror = null; img.src = fallbackUrl(w.subjectId); };
+    } else if (w.correctId) {
+      img.src = gifUrl(w.correctName);
+      img.onerror = () => { img.onerror = null; img.src = fallbackUrl(w.correctId); };
+    }
+    imgWrap.appendChild(img);
+
+    // Text block
+    const info = document.createElement('div');
+    info.className = 'review-info';
+
+    if (w.quizType === 'evo') {
+      const q = document.createElement('div');
+      q.className = 'review-question';
+      q.textContent = `${displayName(w.subjectName)} ${w.direction === 'next' ? '→ evolves into?' : '← evolved from?'}`;
+      const correct = document.createElement('div');
+      correct.className = 'review-correct';
+      correct.innerHTML = `✅ ${w.correctName === '(no evolution)' ? (w.direction === 'next' ? 'Does not evolve' : 'No pre-evolution') : displayName(w.correctName)}`;
+      const wrong = document.createElement('div');
+      wrong.className = 'review-wrong';
+      wrong.innerHTML = `❌ You chose: ${w.chosenName === '(none)' ? (w.direction === 'next' ? 'Does not evolve' : 'No pre-evolution') : displayName(w.chosenName)}`;
+      info.appendChild(q);
+      info.appendChild(correct);
+      info.appendChild(wrong);
+    } else {
+      const q = document.createElement('div');
+      q.className = 'review-question';
+      q.textContent = w.quizType === 'identify'
+        ? `Which image is ${displayName(w.correctName)}?`
+        : `Who's that Pokémon?`;
+      const correct = document.createElement('div');
+      correct.className = 'review-correct';
+      correct.innerHTML = `✅ ${displayName(w.correctName)}`;
+      const wrong = document.createElement('div');
+      wrong.className = 'review-wrong';
+      wrong.innerHTML = w.chosenName ? `❌ You chose: ${displayName(w.chosenName)}` : `❌ Incorrect`;
+      info.appendChild(q);
+      info.appendChild(correct);
+      info.appendChild(wrong);
+    }
+
+    card.appendChild(imgWrap);
+    card.appendChild(info);
+    section.appendChild(card);
+  });
+}
+
 
 // ── Utility ───────────────────────────────────────────────────────
 function preloadNext() {
@@ -2603,11 +2766,14 @@ function updateAccuracy() {
 }
 
 function nextQuestion() {
-	playClick();
-	clearAutoNext();
-	currentQ++;
-	if (currentQ < questions.length) renderQuestion();
-	else showResults();
+  const nxt = document.getElementById('next-btn');
+  if (nxt && nxt.disabled) return; // guard: block double-fire
+  if (nxt) nxt.disabled = true;
+  playClick();
+  clearAutoNext();
+  currentQ++;
+  if (currentQ < questions.length) renderQuestion();
+  else showResults();
 }
 
 function confirmReset() {
@@ -2622,6 +2788,7 @@ function confirmReset() {
             playClick();
             stopTimer();
             clearAutoNext();
+			unduckBgm();
             currentQ = 0; correctCount = 0; answeredCount = 0;
             hintsRevealed = 0;
             startGame();
@@ -2641,6 +2808,7 @@ function confirmGoHome() {
             playClick();
             stopTimer();
             clearAutoNext();
+			unduckBgm();
             currentQ = 0; correctCount = 0; answeredCount = 0;
             difficulty = null;
             document.getElementById('btn-easy').classList.remove('selected');
@@ -2657,6 +2825,7 @@ function restartGame() {
 	stopResultAudio();
 	stopTimer();
 	clearAutoNext();
+	unduckBgm();
 	difficulty = null;
 	document.getElementById('btn-easy').classList.remove('selected');
 	document.getElementById('btn-hard').classList.remove('selected');

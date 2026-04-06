@@ -288,7 +288,21 @@ function renderLeaderboardTable() {
 </table>`;
 
   const youRow = document.getElementById('lb-you-row');
-  if (youRow) setTimeout(() => youRow.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+if (youRow) setTimeout(() => youRow.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+
+// ── "Not on the board" notice ──────────────────────────────────
+const playerInTop50 = data.some(r =>
+  String(r.name || '').trim().toLowerCase() === String(playerName).trim().toLowerCase()
+);
+if (!playerInTop50 && playerName) {
+  const note = document.createElement('p');
+  note.setAttribute('style',
+    'text-align:center;font-size:12px;color:#888;font-family:sans-serif;' +
+    'padding:12px 20px 4px;margin:0;'
+  );
+  note.textContent = `Your score didn't make the Top 50 this time, ${playerName}. Keep training!`;
+  wrap.appendChild(note);
+}
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -307,13 +321,18 @@ function escHtml(str) {
     .replace(/'/g, '&#39;');
 }
 function formatDate(val) {
-  if (!val) return '—';
+  if (!val) return '';
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const s = String(val);
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s; // already DD/MM/YYYY
+  // stored as DD/MM/YYYY → convert to "02 Apr"
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+    const [dd, mm] = s.split('/');
+    return `${dd} ${MONTHS[parseInt(mm, 10) - 1]}`;
+  }
   const d = new Date(s);
   if (!isNaN(d)) {
     const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
-    return `${String(ist.getUTCDate()).padStart(2,'0')}/${String(ist.getUTCMonth()+1).padStart(2,'0')}/${ist.getUTCFullYear()}`;
+    return `${String(ist.getUTCDate()).padStart(2,'0')} ${MONTHS[ist.getUTCMonth()]}`;
   }
   return s;
 }

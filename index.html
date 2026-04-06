@@ -230,10 +230,11 @@
 
     <!-- WHO'S THAT -->
     <div id="whos-section">
-      <div class="pokemon-img-wrap">
-        <div class="spinner" id="spinner"></div>
-        <img id="pokemon-img" src="" alt="Who's that Pokémon?"/>
-      </div>
+    <div class="pokemon-img-wrap">
+	<div class="img-skeleton" id="whos-skeleton"></div>
+	<div class="spinner" id="spinner"></div>
+	<img id="pokemon-img" src="" alt="Who's that Pokémon?">
+    </div>
       <p class="question-label">Who's that Pokémon?</p>
       <div class="options-grid" id="options-grid"></div>
     </div>
@@ -247,10 +248,12 @@
 
     <!-- EVOLUTION -->
     <div id="evo-section">
-      <div class="evo-visual-row" id="evo-visual-row"></div>
-      <div class="evo-question-img-wrap" id="evo-question-img-wrap">
-        <div class="evo-spinner" id="evo-spinner"></div>
-        <img id="evo-pokemon-img" src="" alt=""/>
+    <div class="evo-visual-row" id="evo-visual-row"></div>
+    <div class="evo-question-img-wrap" id="evo-question-img-wrap">
+    <div class="img-skeleton" id="evo-skeleton"></div>
+    <div class="evo-spinner" id="evo-spinner"></div>
+    <img id="evo-pokemon-img" src="" alt="">
+
       </div>
       <div class="evo-options-grid" id="evo-options-grid"></div>
     </div>
@@ -284,7 +287,9 @@
     <p class="lb-submit-status" id="lb-submit-status"></p>
     <button class="restart-btn" onclick="restartGame()">Play Again</button>
     <button class="leaderboard-btn" onclick="showLeaderboard()">Leaderboard</button>
+<button class="share-btn" id="share-btn" onclick="shareScore()">🔗 Share Score</button>
     <button class="home-btn" onclick="goHome()">Choose a Different Quiz</button>
+	<div id="review-section" style="display:none"></div>
   </div>
 
   <!-- ══════════ LEADERBOARD ══════════ -->
@@ -343,7 +348,10 @@
 <!-- Settings Overlay -->
 <div id="settings-overlay" onclick="handleSettingsOverlayClick(event)">
   <div class="s-sheet">
-    <div class="s-title">Settings</div>
+    <div class="s-title-row">
+  <div class="s-title">Settings</div>
+  <button class="s-close-btn" onclick="closeSettings()" title="Close">✕</button>
+</div>
 
     <!-- Generation -->
     <div class="s-label">Generation</div>

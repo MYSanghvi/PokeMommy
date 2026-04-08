@@ -160,18 +160,13 @@
 </div>
 
 <!-- ── Gym Battles (Coming Soon) ──────────────────────────── -->
-<button class="quiz-type-btn quiz-type-btn--coming-soon" disabled title="Gym Battles — Coming Soon!">
-  <span class="qt-icon"><img class="qt-svg-img" src="img/gym_trainer.svg"></span>
-  <span class="qt-text">
-    <span class="qt-title">
-      Gym Battles
-      <span class="qt-coming-soon-badge">Coming Soon</span>
+<button class="quiz-type-btn" id="gym-battles-btn" onclick="gymBattleTap()" title="Gym Battles">
+    <span class="qt-icon"><img class="qt-svg-img" src="img/gym_trainer.svg"></span>
+    <span class="qt-text">
+        <span class="qt-title">Gym Battles<span class="qt-coming-soon-badge" id="gym-coming-soon-badge" style="display:none">Coming Soon</span></span>
+        <span class="qt-desc">Earn badges by mastering Pokémon and their unique types and specialties.</span>
     </span>
-    <span class="qt-desc">
-      Earn badges by mastering Pokémon and their unique types and specialties.
-    </span>
-  </span>
-  <span class="qt-arrow" style="color:#ddd;">›</span>
+    <span class="qt-arrow">›</span>
 </button>
 	  
     </div>
@@ -287,7 +282,7 @@
     <p class="lb-submit-status" id="lb-submit-status"></p>
     <button class="restart-btn" onclick="restartGame()">Play Again</button>
     <button class="leaderboard-btn" onclick="showLeaderboard()">Leaderboard</button>
-<button class="share-btn" id="share-btn" onclick="shareScore()">🔗 Share Score</button>
+    <button class="share-btn" id="share-btn" onclick="shareScore()">Share Score</button>
     <button class="home-btn" onclick="goHome()">Choose a Different Quiz</button>
 	<div id="review-section" style="display:none"></div>
   </div>
@@ -302,7 +297,7 @@
   <!-- ══════════ POKÉDEX — BROWSE ══════════ -->
   <div id="learn-browse-screen" class="screen" style="display:none">
     <button class="back-link" onclick="goHome()">‹ Back</button>
-    <h1 style="font-family:'Flexo',sans-serif;font-size:clamp(26px,6vw,42px);color:#003A70;margin-bottom:16px;">Pokédex</h1>
+    <h1 class="learn-browse-title">Pokédex</h1>
     <input type="text" id="learn-search" placeholder="Search Pokémon…" oninput="filterLearnList()" style="margin-bottom:20px;"/>
     <div id="learn-grid" class="learn-grid"></div>
   </div>

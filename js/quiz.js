@@ -1,52 +1,3 @@
-/* sprite map to convert names to all lowercase 
-const SPRITE_MAP = {
-  bulbasaur:'Bulbasaur',ivysaur:'Ivysaur',venusaur:'Venusaur',
-  charmander:'Charmander',charmeleon:'Charmeleon',charizard:'Charizard',
-  squirtle:'Squirtle',wartortle:'Wartortle',blastoise:'Blastoise',
-  caterpie:'Caterpie',metapod:'Metapod',butterfree:'Butterfree',
-  weedle:'Weedle',kakuna:'Kakuna',beedrill:'Beedrill',
-  pidgey:'Pidgey',pidgeotto:'Pidgeotto',pidgeot:'Pidgeot',
-  rattata:'Rattata',raticate:'Raticate',spearow:'Spearow',fearow:'Fearow',
-  ekans:'Ekans',arbok:'Arbok',pikachu:'Pikachu',raichu:'Raichu',
-  sandshrew:'Sandshrew',sandslash:'Sandslash',
-  'nidoran-f':'Nidoran_F',nidorina:'Nidorina',nidoqueen:'Nidoqueen',
-  'nidoran-m':'Nidoran_M',nidorino:'Nidorino',nidoking:'Nidoking',
-  clefairy:'Clefairy',clefable:'Clefable',vulpix:'Vulpix',ninetales:'Ninetales',
-  jigglypuff:'Jigglypuff',wigglytuff:'Wigglytuff',zubat:'Zubat',golbat:'Golbat',
-  oddish:'Oddish',gloom:'Gloom',vileplume:'Vileplume',
-  paras:'Paras',parasect:'Parasect',venonat:'Venonat',venomoth:'Venomoth',
-  diglett:'Diglett',dugtrio:'Dugtrio',meowth:'Meowth',persian:'Persian',
-  psyduck:'Psyduck',golduck:'Golduck',mankey:'Mankey',primeape:'Primeape',
-  growlithe:'Growlithe',arcanine:'Arcanine',
-  poliwag:'Poliwag',poliwhirl:'Poliwhirl',poliwrath:'Poliwrath',
-  abra:'Abra',kadabra:'Kadabra',alakazam:'Alakazam',
-  machop:'Machop',machoke:'Machoke',machamp:'Machamp',
-  bellsprout:'Bellsprout',weepinbell:'Weepinbell',victreebel:'Victreebel',
-  tentacool:'Tentacool',tentacruel:'Tentacruel',
-  geodude:'Geodude',graveler:'Graveler',golem:'Golem',
-  ponyta:'Ponyta',rapidash:'Rapidash',slowpoke:'Slowpoke',slowbro:'Slowbro',
-  magnemite:'Magnemite',magneton:'Magneton',farfetchd:'Farfetchd',
-  doduo:'Doduo',dodrio:'Dodrio',seel:'Seel',dewgong:'Dewgong',
-  grimer:'Grimer',muk:'Muk',shellder:'Shellder',cloyster:'Cloyster',
-  gastly:'Gastly',haunter:'Haunter',gengar:'Gengar',onix:'Onix',
-  drowzee:'Drowzee',hypno:'Hypno',krabby:'Krabby',kingler:'Kingler',
-  voltorb:'Voltorb',electrode:'Electrode',
-  exeggcute:'Exeggcute',exeggutor:'Exeggutor',
-  cubone:'Cubone',marowak:'Marowak',hitmonlee:'Hitmonlee',hitmonchan:'Hitmonchan',
-  lickitung:'Lickitung',koffing:'Koffing',weezing:'Weezing',
-  rhyhorn:'Rhyhorn',rhydon:'Rhydon',chansey:'Chansey',tangela:'Tangela',
-  kangaskhan:'Kangaskhan',horsea:'Horsea',seadra:'Seadra',
-  goldeen:'Goldeen',seaking:'Seaking',staryu:'Staryu',starmie:'Starmie',
-  'mr-mime':'Mr.Mime',scyther:'Scyther',jynx:'Jynx',
-  electabuzz:'Electabuzz',magmar:'Magmar',pinsir:'Pinsir',tauros:'Tauros',
-  magikarp:'Magikarp',gyarados:'Gyarados',lapras:'Lapras',ditto:'Ditto',
-  eevee:'Eevee',vaporeon:'Vaporeon',jolteon:'Jolteon',flareon:'Flareon',
-  porygon:'Porygon',omanyte:'Omanyte',omastar:'Omastar',
-  kabuto:'Kabuto',kabutops:'Kabutops',aerodactyl:'Aerodactyl',snorlax:'Snorlax',
-  articuno:'Articuno',zapdos:'Zapdos',moltres:'Moltres',
-  dratini:'Dratini',dragonair:'Dragonair',dragonite:'Dragonite',
-  mewtwo:'Mewtwo',mew:'Mew'
-};  */
 // const GIF_BASE      = 'https://cdn.jsdelivr.net/gh/Nackha1/Hd-sprites@master/';  HD GIF source
 const FALLBACK_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 // function gifUrl(name)    { return GIF_BASE+(SPRITE_MAP[name]||capitalize(name))+'.gif'; } HD GIF source
@@ -86,9 +37,10 @@ let onEasterEggClose = null;
 let elapsedSeconds = 0,
 	elapsedTenths = 0;
 const QUICK_COUNT = 20;
-let sessionId = '';
+let sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
 let resultAudio = null;
 let wrongAnswers = [];
+let _settingsSnapshot = null;
 
 
 // ════════════════════════════════════════════════════════════════
@@ -126,17 +78,25 @@ function showNamePopup() {
 }
 
 function selectGender(gender) {
-	playerGender = gender;
-	localStorage.setItem('pokemommy_gender', gender);
-	const boyBtn = document.getElementById('gender-boy');
-	const girlBtn = document.getElementById('gender-girl');
-	if (gender === 'boy') {
-		boyBtn.style.cssText += ';background:#3D7DCA;border-color:#3D7DCA;color:#fff;';
-		girlBtn.style.cssText += ';background:#f9f9f9;border-color:#ddd;color:#666;';
-	} else {
-		girlBtn.style.cssText += ';background:#3D7DCA;border-color:#3D7DCA;color:#fff;';
-		boyBtn.style.cssText += ';background:#f9f9f9;border-color:#ddd;color:#666;';
-	}
+  playerGender = gender;
+  localStorage.setItem('pokemommy_gender', gender);
+  const boyBtn = document.getElementById('gender-boy');
+  const girlBtn = document.getElementById('gender-girl');
+  if (gender === 'boy') {
+    boyBtn.style.background = '#3D7DCA';
+    boyBtn.style.borderColor = '#3D7DCA';
+    boyBtn.style.color = '#fff';
+    girlBtn.style.background = '#f9f9f9';
+    girlBtn.style.borderColor = '#ddd';
+    girlBtn.style.color = '#666';
+  } else {
+    girlBtn.style.background = '#3D7DCA';
+    girlBtn.style.borderColor = '#3D7DCA';
+    girlBtn.style.color = '#fff';
+    boyBtn.style.background = '#f9f9f9';
+    boyBtn.style.borderColor = '#ddd';
+    boyBtn.style.color = '#666';
+  }
 }
 
 function checkNamePopupReady() {
@@ -181,30 +141,48 @@ if (hadEgg) {
 }
 // ── SETTINGS PANEL ───────────────────────────────────────────────
 function openSettings() {
-  const ov = document.getElementById('settings-overlay');
-  // Sync sliders to current values
-  const sfxSlider   = document.getElementById('s-sfx-slider');
-  const musicSlider = document.getElementById('s-music-slider');
-  sfxSlider.value   = Math.round(sfxVolume * 100);
-  musicSlider.value = Math.round(musicVolume * 100);
-  sfxSlider.style.setProperty('--pct', sfxSlider.value + '%');
-  musicSlider.style.setProperty('--pct', musicSlider.value + '%');
-  document.getElementById('s-sfx-val').textContent   = sfxSlider.value + '%';
-  document.getElementById('s-music-val').textContent  = musicSlider.value + '%';
-  document.getElementById('s-sfx-card').classList.toggle('s-muted',   sfxVolume === 0);
-  document.getElementById('s-music-card').classList.toggle('s-muted', musicVolume === 0);
-  document.getElementById('s-auto-duck').checked = autoDuck;
-updateDuckRow(Math.round(musicVolume * 100));
-  const duckRow = document.getElementById('s-duck-row');  
-duckRow.style.opacity = musicVolume === 0 ? '0.4' : '1';    
-duckRow.style.pointerEvents = musicVolume === 0 ? 'none' : '';  
-  document.querySelectorAll('.s-sprite-btn').forEach(b =>
-    b.classList.toggle('selected', b.dataset.style === spriteStyle));
-  ov.classList.add('open');
+    // ── Snapshot current values so X can restore them ────────────
+    _settingsSnapshot = {
+        sfx:    sfxVolume,
+        music:  musicVolume,
+        sprite: spriteStyle,
+        duck:   autoDuck
+    };
+    // ─────────────────────────────────────────────────────────────
+
+    const ov = document.getElementById('settings-overlay');
+    const sfxSlider   = document.getElementById('s-sfx-slider');
+    const musicSlider = document.getElementById('s-music-slider');
+    sfxSlider.value   = Math.round(sfxVolume * 100);
+    musicSlider.value = Math.round(musicVolume * 100);
+    sfxSlider.style.setProperty('--pct',   sfxSlider.value   + '%');
+    musicSlider.style.setProperty('--pct', musicSlider.value + '%');
+    document.getElementById('s-sfx-val').textContent   = sfxSlider.value   + '%';
+    document.getElementById('s-music-val').textContent = musicSlider.value + '%';
+    document.getElementById('s-sfx-card').classList.toggle('s-muted',   sfxVolume   === 0);
+    document.getElementById('s-music-card').classList.toggle('s-muted', musicVolume === 0);
+    document.getElementById('s-auto-duck').checked = autoDuck;
+    updateDuckRow(Math.round(musicVolume * 100));
+    const duckRow = document.getElementById('s-duck-row');
+    duckRow.style.opacity      = musicVolume === 0 ? '0.4' : '1';
+    duckRow.style.pointerEvents = musicVolume === 0 ? 'none' : '';
+    document.querySelectorAll('.s-sprite-btn').forEach(b =>
+        b.classList.toggle('selected', b.dataset.style === spriteStyle));
+    ov.classList.add('open');
 }
 
 function closeSettings() {
-  document.getElementById('settings-overlay').classList.remove('open');
+    // ── Restore all values to what they were before opening ──────
+    if (_settingsSnapshot) {
+        sfxVolume   = _settingsSnapshot.sfx;
+        musicVolume = _settingsSnapshot.music;
+        spriteStyle = _settingsSnapshot.sprite;
+        autoDuck    = _settingsSnapshot.duck;
+        applyBgmVolume();
+        _settingsSnapshot = null;
+    }
+    // ─────────────────────────────────────────────────────────────
+    document.getElementById('settings-overlay').classList.remove('open');
 }
 
 function handleSettingsOverlayClick(e) {
@@ -253,6 +231,7 @@ function saveSettings() {
   localStorage.setItem('pm_sprite_style', spriteStyle);
   localStorage.setItem('pm_auto_duck',    autoDuck);
   applyBgmVolume();
+  _settingsSnapshot = null;
   closeSettings();
 }
 
@@ -859,7 +838,7 @@ function triggerWifey(egg) {
 	}
 	titleEl.textContent = egg.title;
 	bodyEl.textContent  = egg.body;
-	vibrate(50,30,50,30,100);
+	vibrate([50,30,50,30,100]);
 	if (!card.querySelector('.wifey-halo')) {
 		const halo=document.createElement('div'); halo.className='wifey-halo';
 		const neb=document.createElement('div');  neb.className='wifey-nebula';
@@ -984,7 +963,7 @@ function triggerHelu(egg) {
 	}
 	titleEl.textContent=egg.title;
 	bodyEl.textContent =egg.body;
-	vibrate(50,30,50,30,100);
+	vibrate([50,30,50,30,100]);
 	if (!card.querySelector('.helu-halo')) {
 		const halo=document.createElement('div'); halo.className='helu-halo';
 		const noise=document.createElement('div'); noise.className='helu-noise';
@@ -1058,6 +1037,46 @@ document.querySelectorAll('.s-gen-chip').forEach(chip => {
 
 // ── Toast helper Ends ───────────────────────────────────
 
+// ── GYM BATTLES: tap-to-unlock sequence ──────────────────────────
+const GYM_TOASTS = [
+    "Let's not rush into battles… baby hasn't even chosen a starter yet.",
+    "Battles can wait… right now it's all about naps and tiny yawns.",
+    "Let's save battles for later… today's mission is surviving diaper duty.",
+    "Let's not skip ahead, baby's still in the tutorial level.",
+    "Hey! Tiny Trainer hasn't even met Pikachu yet!",
+    "Relax! Baby hasn't even unlocked 'crawl,' and you want battles?",
+    "Patience! You're tapping like a Jigglypuff with a marker and no supervision.",
+    "You again? This isn't a button-mashing contest… or is it?",
+    "Fine… I'll make this section available soon. Baby's not ready, but clearly you are."
+];
+
+let gymTapCount = 0;
+
+function applyGymLock() {
+    const btn = document.getElementById('gym-battles-btn');
+    const badge = document.getElementById('gym-coming-soon-badge');
+    if (!btn) return;
+    btn.classList.add('quiz-type-btn--coming-soon');
+    btn.disabled = true;
+    btn.title = 'Gym Battles Coming Soon!';
+    const arrow = btn.querySelector('.qt-arrow');
+    if (arrow) arrow.style.color = '#ddd';
+    if (badge) badge.style.display = '';
+}
+
+function gymBattleTap() {
+    if (gymTapCount >= 9) return;
+    gymTapCount++;
+    playClick();
+    showToast(GYM_TOASTS[gymTapCount - 1]);
+    if (gymTapCount >= 9) {
+        setTimeout(applyGymLock, 2800);
+    }
+}
+// ── GYM BATTLES END ──────────────────────────────────────────────
+
+
+
 // ── 1. Logo tap milestones ────────────────────────────────────────
 let logoTapCount = 0,
 	logoTapTimer = null;
@@ -1127,57 +1146,8 @@ function checkNightMode() {
     // ── Step 3: Inject night-mode class + styles mid-transition ──
     // Do this at 1.4s so CSS overrides kick in as the fade is halfway done
     setTimeout(() => {
-      if (!document.getElementById('night-mode-styles')) {
-        const style = document.createElement('style');
-        style.id = 'night-mode-styles';
-        style.textContent = `
-body.night-mode, body.night-mode * {
-  --night-text: #e8e8e8;
-  --night-sub: #aab4c8;
-  --night-blue: #7eb3f7;
-}
-#landing-screen h1, #welcome-screen h1, .qt-title,
-.learn-detail-name, #lb-title { color: #7eb3f7 !important; -webkit-text-stroke: 0 !important; }
-.qt-desc, .landing-subtitle, label, .learn-info-label, .learn-dex-entry,
-.learn-category, .lc-name, .evo-mem-name, .result-msg,
-.result-score-sub, .result-time, .feedback-msg, .top-bar,
-.page-footer, .page-footer *, .lb-table td,
-.lb-table th { color: #aab4c8 !important; }
-#learn-category { color: #e8e8e8 !important; }
-.entry-text { color: #e8e8e8 !important; }
-.qt-title, #welcome-title, .learn-detail-num, .lc-num,
-.evo-mem-num { color: #7eb3f7 !important; }
-.quiz-type-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; }
-.quiz-type-btn:hover { background: #2a3f6a !important; border-color: #7eb3f7 !important; }
-.diff-btn, .toggle-btn, .learn-nav-btn, .learn-card {
-  background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important;
-}
-.diff-btn.selected, .toggle-btn.active { background: #3D7DCA !important; color: #fff !important; }
-input[type="text"] { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
-input[type="text"]::placeholder { color: #556a8a !important; }
-.hint-card, .learn-info-card { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
-.lb-table { background: transparent !important; }
-.lb-table tr { background: #1e2d4a !important; }
-.lb-table tr.lb-you { background: #2a3f6a !important; }
-.lb-table th { background: #16213e !important; color: #7eb3f7 !important; }
-.opt-btn, .img-opt-btn, .evo-opt-btn { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #e8e8e8 !important; }
-.opt-btn.correct, .img-opt-btn.correct, .evo-opt-btn.correct { background: #1a4a2a !important; border-color: #28a745 !important; }
-.opt-btn.wrong, .img-opt-btn.wrong, .evo-opt-btn.wrong { background: #4a1a1a !important; border-color: #dc3545 !important; }
-.progress-wrap { background: #2e4a7a !important; }
-.gen-badge { background: #1e2d4a !important; border-color: #2e4a7a !important; color: #aab4c8 !important; }
-.gen-badge.gen-active { background: #2a3f6a !important; border-color: #7eb3f7 !important; color: #7eb3f7 !important; }
-.question-label { color: #e0e0e0 !important; }
-.q-counter, .q-counter * { color: #7eb3f7 !important; }
-.learn-section-label { color: #e8e8e8 !important; }
-#learn-browse-screen h1 { color: #7eb3f7 !important; -webkit-text-stroke: 0 !important; }
-.top-row-2 .trainer { color: #7eb3f7 !important; }
-.top-row-2 .acc-inline, .top-row-2 .timer-display { color: #7eb3f7 !important; }
-`;
-
-        document.head.appendChild(style);
-      }
-      document.body.classList.add('night-mode');
-    }, 800);
+  document.body.classList.add('night-mode');
+}, 800);
 
     // ── Step 4: Stars fade in alongside the darkening ─────────
     setTimeout(() => {
@@ -1392,6 +1362,8 @@ function checkTrainerNameEgg(name) {
     'ashketchum':       'ash',
     'garyoak':          'gary',
     'mistywaterflower': 'misty',
+	'sssiddhi':         'thewifey',
+	'preeyanshee':      'helu',
     'brockslater':      'brock',
   };
   const resolvedKey = ALIASES[key] ?? key;
@@ -1405,14 +1377,14 @@ function checkTrainerNameEgg(name) {
     setTimeout(() => triggerChosenOne(egg), 300);
     return true;
   }
-  if (resolvedKey === 'thewifey' || resolvedKey === 'sssiddhi') {
+  if (resolvedKey === 'thewifey') {
     const variants = TRAINER_EGGS['thewifey'];
     const egg = variants[Math.floor(Math.random() * variants.length)];
     playWifeySound();
     setTimeout(() => triggerWifey(egg), 300);
     return true;
   }
-  if (resolvedKey === 'helu' || resolvedKey === 'preeyanshee') {
+  if (resolvedKey === 'helu') {
     const variants = TRAINER_EGGS['helu'];
     const egg = variants[Math.floor(Math.random() * variants.length)];
     playHeluSound();
@@ -2347,15 +2319,16 @@ async function revealHint(level) {
 	const card = document.createElement('div');
 	card.className = 'hint-card';
 	if (level === 1) {
-		const g = currentPokemonData.species.genera.find(g => g.language.name === 'en');
-		card.innerHTML = `<strong>🏷️ Hint 1 - Category</strong>${g?g.genus:'Unknown'}`;
-	} else if (level === 2) {
-		const b = currentPokemonData.types.map(t => `<span class="type-badge t-${t.type.name}">${capitalize(t.type.name)}</span>`).join('');
-		card.innerHTML = `<strong>⚡ Hint 2 - Type</strong>${b}`;
-	} else {
-		const e = currentPokemonData.species.flavor_text_entries.find(e => e.language.name === 'en' && (e.version.name === 'red' || e.version.name === 'blue')) || currentPokemonData.species.flavor_text_entries.find(e => e.language.name === 'en');
-		card.innerHTML = `<strong>📖 Hint 3 - Pokédex Entry</strong><span class="entry-text">${e?e.flavor_text.replace(/[\f\n\r]/g,' '):'No entry found.'}</span>`;
-	}
+  const g = currentPokemonData.species.genera.find(g => g.language.name === 'en');
+  card.innerHTML = `<strong>Hint 1 - Category</strong><br>${g ? g.genus : 'Unknown'}`;
+} else if (level === 2) {
+  const b = currentPokemonData.types.map(t => `<span class="type-badge t-${t.type.name}">${capitalize(t.type.name)}</span>`).join(' ');
+  card.innerHTML = `<strong>Hint 2 - Type</strong><br>${b}`;
+} else {
+  const e = currentPokemonData.species.flavor_text_entries.find(e => e.language.name === 'en' && (e.version.name === 'red' || e.version.name === 'blue')) ||
+            currentPokemonData.species.flavor_text_entries.find(e => e.language.name === 'en');
+  card.innerHTML = `<strong>Hint 3 - Pokédex Entry</strong><br><span class="entry-text">${e ? e.flavor_text.replace(/\f/g, ' ') : 'No entry found.'}</span>`;
+}
 	document.getElementById('hint-cards').appendChild(card);
 }
 
@@ -2381,6 +2354,8 @@ function buildLearnGrid(list) {
 		card.onclick = () => openLearnDetail(p.id);
 		const img = document.createElement('img');
 		img.src = gifUrl(p.name);
+		img.loading = 'lazy'; 
+		img.decoding = 'async';
 		img.onerror = () => {
 			img.onerror = null;
 			img.src = fallbackUrl(p.id);
@@ -2477,15 +2452,6 @@ try {
 	await buildLearnEvoLine(pokemonId, specData);
 }
 
-function stopLearnAudio() {
-	if (learnAudio) {
-		learnAudio.onended = null;
-		learnAudio.pause();
-		learnAudio = null;
-	}
-	const btn = document.getElementById('learn-speaker-btn');
-	if (btn) btn.classList.remove('playing');
-}
 
 function playLearnAudio() {
 	if (!learnCurrentId || !soundOn) return;
@@ -2582,6 +2548,7 @@ function makeLearnEvoMember(p, currentId) {
 	};
 	const img = document.createElement('img');
 	img.src = gifUrl(p.name);
+	img.decoding = 'async';
 	img.onerror = () => {
 		img.onerror = null;
 		img.src = fallbackUrl(p.id);

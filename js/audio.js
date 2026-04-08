@@ -33,7 +33,22 @@ function applyBgmVolume() {
 function duckBgm() {
   if (!bgmAudio || !autoDuck || musicVolume === 0) return;
   if (_unduckTimer) { clearInterval(_unduckTimer); _unduckTimer = null; }
-  bgmAudio.volume = soundOn ? musicVolume * 0.2 : 0;
+  const target = soundOn ? musicVolume * 0.2 : 0;
+  if (bgmAudio.volume === target) return;
+  const start = bgmAudio.volume;
+  const STEPS = 15;
+  const PERIOD = 200 / STEPS; // 200ms fast fade-down
+  let step = 0;
+  _unduckTimer = setInterval(() => {
+    step++;
+    const t = step / STEPS;
+    bgmAudio.volume = Math.max(start + (target - start) * t, 0);
+    if (step >= STEPS) {
+      clearInterval(_unduckTimer);
+      _unduckTimer = null;
+      bgmAudio.volume = target;
+    }
+  }, PERIOD);
 }
 
 let _unduckTimer = null;
@@ -160,10 +175,19 @@ function toggleSound() {
 }
 
 function stopResultAudio() {
-  if(resultAudio){ resultAudio.onended = null; resultAudio.pause(); resultAudio = null; }
+  if (typeof resultAudio !== 'undefined' && resultAudio) {
+    resultAudio.onended = null;
+    resultAudio.pause();
+    resultAudio = null;
+  }
 }
+
 function stopLearnAudio() {
-  if(learnAudio){ learnAudio.onended = null; learnAudio.pause(); learnAudio = null; }
+  if (typeof learnAudio !== 'undefined' && learnAudio) {
+    learnAudio.onended = null;
+    learnAudio.pause();
+    learnAudio = null;
+  }
   const btn = document.getElementById('learn-speaker-btn');
-  if(btn) btn.classList.remove('playing');
+  if (btn) btn.classList.remove('playing');
 }

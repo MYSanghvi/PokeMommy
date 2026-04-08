@@ -17,6 +17,8 @@ function startTimer() {
 function stopTimer() {
   if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
 }
+
+
 function getTimeString() {
   const m=Math.floor(timerSeconds/60), s=timerSeconds%60, t=timerTenths%10;
   return `${m}m ${String(s).padStart(2,'0')}.${t}s`;
@@ -75,20 +77,21 @@ mode: quizMode === 'full' ? 'Full Test' : 'Quick Test',
 sessionId: sessionId
 };
 try {
-await fetch(APPS_SCRIPT_URL,{
-method:'POST', mode:'no-cors',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(payload)
-});
-statusEl.textContent='✅ Score saved!';
+  await fetch(APPS_SCRIPT_URL,{
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  statusEl.textContent='✅ Score submitted! Check the leaderboard to confirm.';
 } catch(e) {
-statusEl.textContent='⚠️ Could not save score.';
+  statusEl.textContent='⚠️ Could not save score. Check your connection.';
 }
 setTimeout(()=>{ statusEl.textContent=''; }, 3000);
 }
 
 // ── Leaderboard ──────────────────────────────────────────────────
 let lbAllData=[];
+let _lbMsgTimer = null;
 
 function showLeaderboard() {
 playClick();
@@ -133,6 +136,7 @@ const LB_LOADING_MSGS = [
 ];
 
 async function fetchLeaderboard() {
+  if (_lbMsgTimer) { clearInterval(_lbMsgTimer); _lbMsgTimer = null; }
   const wrap = document.getElementById('lb-table-wrap');
 
   // ── Rotating loading messages ─────────────────────────────────
@@ -153,7 +157,7 @@ async function fetchLeaderboard() {
   showNextMsg();
   wrap.appendChild(loadEl);
 
-  const msgTimer = setInterval(showNextMsg, 5000);
+  _lbMsgTimer = setInterval(showNextMsg, 5000);
 
   const controller = new AbortController();
   const timeout = setTimeout(()=>controller.abort(), 40000); // 40s — enough for all messages
@@ -163,7 +167,8 @@ async function fetchLeaderboard() {
       signal: controller.signal
     });
     clearTimeout(timeout);
-    clearInterval(msgTimer);
+    clearInterval(_lbMsgTimer);
+	_lbMsgTimer = null;
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     let json = (await res.text()).trim();
@@ -176,7 +181,8 @@ async function fetchLeaderboard() {
 
   } catch(e) {
     clearTimeout(timeout);
-    clearInterval(msgTimer);
+    clearInterval(_lbMsgTimer);
+	_lbMsgTimer = null;
     wrap.innerHTML = '';
     const errEl = document.createElement('p');
     errEl.setAttribute('style',
@@ -259,7 +265,7 @@ function renderLeaderboardTable() {
   const medals = ['🥇', '🥈', '🥉'];
   const rows = data.map((r, i) => {
     const isMyName   = String(r.name || '').trim().toLowerCase() === String(playerName).trim().toLowerCase();
-    const isCurrentSession = String(r.sessionid) === sessionId;
+    const isCurrentSession = String(r.sessionId) === sessionId;
     const isYou      = isMyName;
 
     const rank      = i < 3 ? medals[i] : `#${i + 1}`;

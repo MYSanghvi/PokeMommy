@@ -21,10 +21,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: #FFCB05; font-family: 'Flexo', sans-serif;
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; padding: 16px; overflow-x: hidden;
-  touch-action: manipulation;
+background: #FFCB05; font-family: 'Flexo', sans-serif;
+min-height: 100vh; display: flex; flex-direction: column;
+align-items: center; justify-content: center; padding: 16px; overflow-x: hidden;
+touch-action: manipulation; padding-top: max(16px, env(safe-area-inset-top));
 }
 small { font-family: 'Flexo', sans-serif; }
 
@@ -32,7 +32,7 @@ small { font-family: 'Flexo', sans-serif; }
   background: #fff; border-radius: 16px; padding: clamp(12px, 3vw, 20px) clamp(12px, 3vw, 22px);
   max-width: 520px; width: 100%;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18); text-align: center;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ── LANDING ── */
@@ -1272,13 +1272,13 @@ body.night-mode .img-skeleton {
 
 /* ── SHARE BUTTON ──────────────────────────────────────────────── */
 .share-btn {
-  background: transparent;
+  background: #fff;
   color: #3D7DCA;
   border: 2px solid #3D7DCA;
   border-radius: 10px;
-  padding: 11px 28px;
+  padding: 13px 28px;
   width: 100%;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   font-family: Flexo, sans-serif;
   cursor: pointer;
@@ -1413,3 +1413,107 @@ body.night-mode .quiz-type-btn--coming-soon:hover {
 }
 
 body.night-mode .learn-browse-title { color: #7eb3f7 !important; }
+
+
+/* ── REVIEW MISTAKES ───────────────────────────────────────── */
+#review-section {
+    margin-top: 24px;
+    width: 100%;
+    text-align: left;
+}
+
+.review-title {
+    font-family: 'Flexo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #003A70;
+    margin-bottom: 12px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-top: 2px solid #eee;
+    padding-top: 18px;
+}
+
+.review-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f9f9f9;
+    border: 2px solid #f0d0d0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.review-img-wrap {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    border: 2px solid #eee;
+    overflow: hidden;
+}
+
+.review-sprite {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.review-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.review-question {
+    font-family: 'Flexo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.review-correct {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: #155724;
+    font-weight: 700;
+    margin-bottom: 3px;
+    line-height: 1.4;
+}
+
+.review-wrong {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: #721c24;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+/* Dark mode */
+body.night-mode .review-title {
+    color: #7eb3f7;
+    border-top-color: #2e4a7a;
+}
+
+body.night-mode .review-card {
+    background: #1e2d4a;
+    border-color: #5a2a2a;
+}
+
+body.night-mode .review-img-wrap {
+    background: #162238;
+    border-color: #2e4a7a;
+}
+
+body.night-mode .review-question { color: #aab4c8; }
+body.night-mode .review-correct  { color: #6daa45; }
+body.night-mode .review-wrong    { color: #dd6974; }
+/* ── REVIEW MISTAKES END ────────────────────────────────────── */

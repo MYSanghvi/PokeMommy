@@ -1636,10 +1636,11 @@ function attachLongPress(imgEl, pokemonId) {
 }
 
 function playLearnCry(pokemonId) {
-	if (!soundOn) return;
-	const cry = new Audio(`https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${pokemonId}.ogg`);
-	cry.volume = 0.5 * sfxVolume;
-	cry.play().catch(() => {});
+    if (!soundOn) return;
+    stopLearnAudio();
+    learnAudio = new Audio('https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/' + pokemonId + '.ogg');
+    learnAudio.volume = 0.5 * sfxVolume;
+    learnAudio.play().catch(() => {});
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1860,7 +1861,7 @@ function buildEvoOptions(evoQ) {
 }
 
 async function startGame() {
-	sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+	sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
 	getCtx();
 	stopWhosThatAudio();
 	const rawName = document.getElementById('player-name').value.trim();

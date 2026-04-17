@@ -204,7 +204,7 @@
   <div id="game-screen" class="screen">
     <div class="top-bar">
   <div class="top-row-1">
-    <button class="topbar-back-btn" onclick="confirmGoHome()" title="Back to menu">&#8592; Back</button>
+    <button class="topbar-back-btn" onclick="confirmGoHome()" title="Quit quiz">&#8592; Quit</button>
     <button class="reset-btn" onclick="confirmReset()">&#8635; Reset</button>
   </div>
   <div class="top-row-2">
@@ -390,24 +390,38 @@
 
     <!-- Visual Style -->
     <div class="s-label">Visual Style</div>
-    <div class="s-sprite-grid">
+    <div class="s-sprite-grid" id="s-sprite-grid">
       <div class="s-sprite-btn" data-style="hd" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-        <span class="s-sprite-icon">✨</span>
+     <!--     <span class="s-sprite-icon">✨</span> -->
         <span class="s-sprite-name">HD Animated 3D</span>
         <span class="s-sprite-desc">Lively high-def Pokémon animations</span>
         <span class="s-sprite-tick">✓ Selected</span>
       </div>
       <div class="s-sprite-btn selected" data-style="sd" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-        <span class="s-sprite-icon">⚡</span>
+     <!--     <span class="s-sprite-icon">⚡</span> -->
         <span class="s-sprite-name">SD Animated 3D</span> 
         <span class="s-sprite-desc">Smooth standard Pokémon animations</span> <!-- From Pokemon Sun and Moon Gen 7-->
         <span class="s-sprite-tick">✓ Selected</span>
       </div>
       <div class="s-sprite-btn" data-style="static" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-        <span class="s-sprite-icon">🕹️</span>
+      <!--    <span class="s-sprite-icon">🕹️</span>-->
         <span class="s-sprite-name">Static 2D</span>
         <span class="s-sprite-desc">Classic Pokémon art</span> <!-- From Pokemon Official Art -->
         <span class="s-sprite-tick">✓ Selected</span>
+      </div>
+    </div>
+
+    <div class="s-label">Animation</div>
+    <div class="s-animation-grid" id="s-animation-grid">
+      <div class="s-animation-btn selected" data-mode="beautiful" onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+        <span class="s-animation-name">Beautiful</span>
+        <span class="s-animation-desc">Smooth animation and transitions between questions.</span>
+        <span class="s-animation-tick">Selected</span>
+      </div>
+      <div class="s-animation-btn" data-mode="fast" onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+        <span class="s-animation-name">Fast</span>
+        <span class="s-animation-desc">No transitions or animations for speed-focused runs.</span>
+        <span class="s-animation-tick">Selected</span>
       </div>
     </div>
 

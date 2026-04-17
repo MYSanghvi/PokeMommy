@@ -233,6 +233,16 @@ function clearQuizTransientState() {
 // ── WELCOME POPUP MESSAGE
 // ════════════════════════════════════════════════════════════════
 
+function applyAnimationMode() {
+  document.body.classList.toggle('fast-animations', animationMode === 'fast');
+}
+
+function useBeautifulAnimations() {
+  return animationMode !== 'fast';
+}
+
+applyAnimationMode();
+
 function showWelcomePopup() {
   const popup = byId('welcome-popup');
   if (!popup) return;
@@ -366,7 +376,8 @@ function openSettings() {
     sfx: sfxVolume,
     music: musicVolume,
     sprite: spriteStyle,
-    duck: autoDuck
+    duck: autoDuck,
+    animation: animationMode
   };
 
   const ov = byId('settings-overlay');
@@ -378,8 +389,9 @@ function openSettings() {
   const musicCard = byId('s-music-card');
   const autoDuckToggle = byId('s-auto-duck');
   const duckRow = byId('s-duck-row');
+  const animationGrid = byId('s-animation-grid');
 
-  if (!ov || !sfxSlider || !musicSlider || !sfxVal || !musicVal || !sfxCard || !musicCard || !autoDuckToggle || !duckRow) {
+  if (!ov || !sfxSlider || !musicSlider || !sfxVal || !musicVal || !sfxCard || !musicCard || !autoDuckToggle || !duckRow || !animationGrid) {
     console.warn('Settings UI is incomplete in the DOM.');
     return;
   }
@@ -405,6 +417,9 @@ function openSettings() {
   document.querySelectorAll('.s-sprite-btn').forEach(b => {
     b.classList.toggle('selected', b.dataset.style === spriteStyle);
   });
+  animationGrid.querySelectorAll('.s-animation-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.mode === animationMode);
+  });
 
   ov.classList.add('open');
   setBodyScrollLocked(true);
@@ -416,7 +431,9 @@ function closeSettings() {
     musicVolume = _settingsSnapshot.music;
     spriteStyle = _settingsSnapshot.sprite;
     autoDuck = _settingsSnapshot.duck;
+    animationMode = _settingsSnapshot.animation;
     applyBgmVolume();
+    applyAnimationMode();
     _settingsSnapshot = null;
   }
 
@@ -482,18 +499,22 @@ function onSettingsSlider(type, val) {
 function saveSettings() {
   playClick();
 
-  const selected = document.querySelector('.s-sprite-btn.selected');
+  const selected = byId('s-sprite-grid')?.querySelector('.s-sprite-btn.selected');
+  const selectedAnimation = byId('s-animation-grid')?.querySelector('.s-animation-btn.selected');
   const autoDuckToggle = byId('s-auto-duck');
 
   if (selected) spriteStyle = selected.dataset.style;
+  if (selectedAnimation) animationMode = selectedAnimation.dataset.mode;
   if (autoDuckToggle) autoDuck = autoDuckToggle.checked;
 
   lsSet('pm_sfx_vol', sfxVolume);
   lsSet('pm_music_vol', musicVolume);
   lsSet('pm_sprite_style', spriteStyle);
   lsSet('pm_auto_duck', autoDuck);
+  lsSet('pm_animation_mode', animationMode);
 
   applyBgmVolume();
+  applyAnimationMode();
   _settingsSnapshot = null;
 
   const overlay = byId('settings-overlay');
@@ -2441,7 +2462,11 @@ function renderEvoQuestion(evoQ) {
         .forEach(i => { i.style.opacity = 1; });
     }
   };
-  setTimeout(() => { minDelayDone = true; tryRevealOptions(); }, 380);
+  if (useBeautifulAnimations()) {
+    setTimeout(() => { minDelayDone = true; tryRevealOptions(); }, 380);
+  } else {
+    minDelayDone = true;
+  }
 
   img.onload = () => {
   spn.style.display = 'none';
@@ -2535,6 +2560,7 @@ function renderEvoQuestion(evoQ) {
 
 
 function animateQuestionIn() {
+  if (!useBeautifulAnimations()) return;
   const sectionId = quizType === 'whos'     ? 'whos-section'
                   : quizType === 'identify' ? 'identify-section'
                   : 'evo-section';
@@ -3075,26 +3101,31 @@ function showResults() {
   document.getElementById('lb-submit-status').textContent = 'Saving score…';
   showScreen('result-screen');
 
-  setTimeout(() => {
-    const el = document.getElementById('result-pct');
-    const duration = 1000;
-    const start = performance.now();
-    function tick(now) {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.round(eased * pct) + '%';
-      if (progress < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        el.textContent = pct + '%';
-        el.classList.add('result-pct--pop');
-        setTimeout(() => el.classList.remove('result-pct--pop'), 600);
-        celebrationConfetti(pct);
-        if (pct >= 80) playFanfare();
+  if (!useBeautifulAnimations()) {
+    document.getElementById('result-pct').textContent = pct + '%';
+    if (pct >= 80) playFanfare();
+  } else {
+    setTimeout(() => {
+      const el = document.getElementById('result-pct');
+      const duration = 1000;
+      const start = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * pct) + '%';
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          el.textContent = pct + '%';
+          el.classList.add('result-pct--pop');
+          setTimeout(() => el.classList.remove('result-pct--pop'), 600);
+          celebrationConfetti(pct);
+          if (pct >= 80) playFanfare();
+        }
       }
-    }
-    requestAnimationFrame(tick);
-  }, 300);
+      requestAnimationFrame(tick);
+    }, 300);
+  }
 
   if (pct === 100) setTimeout(triggerMewEasterEgg, 800);
 
@@ -3244,7 +3275,7 @@ function nextQuestion() {
     }
   };
 
-  if (el) {
+  if (el && useBeautifulAnimations()) {
     el.classList.add('q-leaving');
     setTimeout(() => {
       el.classList.remove('q-leaving');
@@ -3294,6 +3325,7 @@ function confirmGoHome() {
 			difficulty = null;
             document.getElementById('btn-easy').classList.remove('selected');
             document.getElementById('btn-hard').classList.remove('selected');
+            document.getElementById('start-btn').textContent = 'Start Quiz!';
             document.getElementById('start-btn').disabled = true;
             checkReady();
             showScreen('welcome-screen');

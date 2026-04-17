@@ -37,6 +37,7 @@ let sfxVolume = parseFloat(lsGet('pm_sfx_vol', '0.7'));
 let musicVolume = parseFloat(lsGet('pm_music_vol', '0.5'));
 let spriteStyle = lsGet('pm_sprite_style', 'sd');
 let autoDuck = lsGet('pm_auto_duck', 'true') !== 'false';
+let animationMode = lsGet('pm_animation_mode', 'beautiful');
 
 let bgmAudio = null;
 let _unduckTimer = null;

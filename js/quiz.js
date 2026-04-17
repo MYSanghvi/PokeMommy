@@ -35,6 +35,83 @@ let hintsRevealed = 0,
 let autoNextTimer = null;
 let onEasterEggClose = null;
 const QUICK_COUNT = 20;
+const API_TIMEOUT_MS = 3000;
+const GEN1_POKEMON_NAMES = [
+  'bulbasaur', 'ivysaur', 'venusaur', 'charmander', 'charmeleon', 'charizard', 'squirtle', 'wartortle', 'blastoise',
+  'caterpie', 'metapod', 'butterfree', 'weedle', 'kakuna', 'beedrill', 'pidgey', 'pidgeotto', 'pidgeot', 'rattata',
+  'raticate', 'spearow', 'fearow', 'ekans', 'arbok', 'pikachu', 'raichu', 'sandshrew', 'sandslash', 'nidoran-f',
+  'nidorina', 'nidoqueen', 'nidoran-m', 'nidorino', 'nidoking', 'clefairy', 'clefable', 'vulpix', 'ninetales',
+  'jigglypuff', 'wigglytuff', 'zubat', 'golbat', 'oddish', 'gloom', 'vileplume', 'paras', 'parasect', 'venonat',
+  'venomoth', 'diglett', 'dugtrio', 'meowth', 'persian', 'psyduck', 'golduck', 'mankey', 'primeape', 'growlithe',
+  'arcanine', 'poliwag', 'poliwhirl', 'poliwrath', 'abra', 'kadabra', 'alakazam', 'machop', 'machoke', 'machamp',
+  'bellsprout', 'weepinbell', 'victreebel', 'tentacool', 'tentacruel', 'geodude', 'graveler', 'golem', 'ponyta',
+  'rapidash', 'slowpoke', 'slowbro', 'magnemite', 'magneton', 'farfetchd', 'doduo', 'dodrio', 'seel', 'dewgong',
+  'grimer', 'muk', 'shellder', 'cloyster', 'gastly', 'haunter', 'gengar', 'onix', 'drowzee', 'hypno', 'krabby',
+  'kingler', 'voltorb', 'electrode', 'exeggcute', 'exeggutor', 'cubone', 'marowak', 'hitmonlee', 'hitmonchan',
+  'lickitung', 'koffing', 'weezing', 'rhyhorn', 'rhydon', 'chansey', 'tangela', 'kangaskhan', 'horsea', 'seadra',
+  'goldeen', 'seaking', 'staryu', 'starmie', 'mr-mime', 'scyther', 'jynx', 'electabuzz', 'magmar', 'pinsir',
+  'tauros', 'magikarp', 'gyarados', 'lapras', 'ditto', 'eevee', 'vaporeon', 'jolteon', 'flareon', 'porygon',
+  'omanyte', 'omastar', 'kabuto', 'kabutops', 'aerodactyl', 'snorlax', 'articuno', 'zapdos', 'moltres', 'dratini',
+  'dragonair', 'dragonite', 'mewtwo', 'mew'
+];
+const GEN1_EVOLUTION_CHAINS = [
+  ['bulbasaur', 'ivysaur', 'venusaur'],
+  ['charmander', 'charmeleon', 'charizard'],
+  ['squirtle', 'wartortle', 'blastoise'],
+  ['caterpie', 'metapod', 'butterfree'],
+  ['weedle', 'kakuna', 'beedrill'],
+  ['pidgey', 'pidgeotto', 'pidgeot'],
+  ['rattata', 'raticate'],
+  ['spearow', 'fearow'],
+  ['ekans', 'arbok'],
+  ['pikachu', 'raichu'],
+  ['sandshrew', 'sandslash'],
+  ['nidoran-f', 'nidorina', 'nidoqueen'],
+  ['nidoran-m', 'nidorino', 'nidoking'],
+  ['clefairy', 'clefable'],
+  ['vulpix', 'ninetales'],
+  ['jigglypuff', 'wigglytuff'],
+  ['zubat', 'golbat'],
+  ['oddish', 'gloom', 'vileplume'],
+  ['paras', 'parasect'],
+  ['venonat', 'venomoth'],
+  ['diglett', 'dugtrio'],
+  ['meowth', 'persian'],
+  ['psyduck', 'golduck'],
+  ['mankey', 'primeape'],
+  ['growlithe', 'arcanine'],
+  ['poliwag', 'poliwhirl', 'poliwrath'],
+  ['abra', 'kadabra', 'alakazam'],
+  ['machop', 'machoke', 'machamp'],
+  ['bellsprout', 'weepinbell', 'victreebel'],
+  ['tentacool', 'tentacruel'],
+  ['geodude', 'graveler', 'golem'],
+  ['ponyta', 'rapidash'],
+  ['slowpoke', 'slowbro'],
+  ['magnemite', 'magneton'],
+  ['doduo', 'dodrio'],
+  ['seel', 'dewgong'],
+  ['grimer', 'muk'],
+  ['shellder', 'cloyster'],
+  ['gastly', 'haunter', 'gengar'],
+  ['drowzee', 'hypno'],
+  ['krabby', 'kingler'],
+  ['voltorb', 'electrode'],
+  ['exeggcute', 'exeggutor'],
+  ['cubone', 'marowak'],
+  ['koffing', 'weezing'],
+  ['rhyhorn', 'rhydon'],
+  ['horsea', 'seadra'],
+  ['goldeen', 'seaking'],
+  ['staryu', 'starmie'],
+  ['magikarp', 'gyarados'],
+  ['eevee', 'vaporeon'],
+  ['eevee', 'jolteon'],
+  ['eevee', 'flareon'],
+  ['omanyte', 'omastar'],
+  ['kabuto', 'kabutops'],
+  ['dratini', 'dragonair', 'dragonite']
+];
 let sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
 let resultAudio = null;
 let wrongAnswers = [];
@@ -42,6 +119,67 @@ let _settingsSnapshot = null;
 let _learnRequestToken = 0;
 let _hintRequestToken = 0;
 let _quizRunToken = 0;
+
+function fetchWithTimeout(url, options = {}, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeoutId));
+}
+
+function buildLocalPokemonList() {
+  return GEN1_POKEMON_NAMES.map((name, index) => ({
+    id: index + 1,
+    name
+  }));
+}
+
+function buildLocalEvolutionChain(pokemonId) {
+  const subject = allPokemon.find(p => p.id === pokemonId);
+  if (!subject) {
+    throw new Error('Pokemon not found in local list');
+  }
+
+  const familyChains = GEN1_EVOLUTION_CHAINS.filter(chain => chain.includes(subject.name));
+  const familyNames = familyChains.length
+    ? [...new Set(familyChains.flat())]
+    : [subject.name];
+
+  const familyMembers = familyNames
+    .map(name => allPokemon.find(p => p.name === name))
+    .filter(Boolean);
+
+  const parentMap = {};
+  const childrenMap = {};
+
+  familyMembers.forEach(member => {
+    parentMap[member.name] = null;
+    childrenMap[member.name] = [];
+  });
+
+  familyChains.forEach(chain => {
+    for (let i = 0; i < chain.length - 1; i++) {
+      const parentName = chain[i];
+      const childName = chain[i + 1];
+      const child = allPokemon.find(p => p.name === childName);
+
+      if (!(parentName in childrenMap)) childrenMap[parentName] = [];
+      if (!(childName in parentMap)) parentMap[childName] = null;
+
+      if (child && !childrenMap[parentName].some(p => p.name === child.name)) {
+        childrenMap[parentName].push(child);
+      }
+      parentMap[childName] = allPokemon.find(p => p.name === parentName) || null;
+    }
+  });
+
+  return {
+    allMembers: familyMembers,
+    parentMap,
+    childrenMap
+  };
+}
 
 
 function byId(id) {
@@ -56,6 +194,39 @@ function setBodyScrollLocked(locked) {
     (byId('settings-overlay') && byId('settings-overlay').classList.contains('open'));
 
   document.body.style.overflow = (locked || hasBlockingOverlay) ? 'hidden' : '';
+}
+
+function clearQuizTransientState() {
+  clearAutoNext();
+  stopWhosThatAudio();
+  stopLearnAudio();
+  stopResultAudio();
+  currentPokemonData = null;
+
+  const feedback = byId('feedback-msg');
+  if (feedback) {
+    feedback.textContent = '';
+    feedback.style.color = '';
+  }
+
+  const hintCards = byId('hint-cards');
+  if (hintCards) hintCards.innerHTML = '';
+
+  [1, 2, 3].forEach(i => {
+    const btn = byId(`hint-btn-${i}`);
+    if (!btn) return;
+    btn.classList.remove('used');
+    btn.disabled = i !== 1;
+  });
+
+  const nextBtn = byId('next-btn');
+  if (nextBtn) {
+    nextBtn.style.display = 'none';
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '';
+    nextBtn.style.cursor = '';
+    nextBtn.textContent = currentQ < questions.length - 1 ? 'Next →' : 'See Results 🏆';
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1918,42 +2089,56 @@ function checkReady() {
 
 async function loadPokemonList() {
   try {
-    const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
-    if (!res.ok) throw new Error('API error ' + res.status);
+    const res = await fetchWithTimeout('https://pokeapi.co/api/v2/pokemon?limit=151');
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+
     const data = await res.json();
-    allPokemon = data.results.map((p, i) => ({ id: i + 1, name: p.name }));
-  } catch(e) {
-    showToast("⚠️ Couldn't reach Professor Oak's lab. Check your connection and try again!");
-    const btn = document.getElementById('start-btn');
-    btn.disabled = false;
-    btn.textContent = 'Try Again';
+    allPokemon = data.results.map((p, i) => ({
+      id: i + 1,
+      name: p.name
+    }));
+
+    return true;
+  } catch (e) {
+    console.warn('loadPokemonList failed, using local fallback:', e);
+    allPokemon = buildLocalPokemonList();
+    return allPokemon.length > 0;
   }
 }
 
 async function getEvolutionChain(pokemonId) {
-	const specRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
-	const specData = await specRes.json();
-	const chainRes = await fetch(specData.evolution_chain.url);
-	const chainData = await chainRes.json();
-	const list = [];
-	const parentMap = {},
-		childrenMap = {};
+	try {
+		const specRes = await fetchWithTimeout(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
+		if (!specRes.ok) throw new Error(`Species API error: ${specRes.status}`);
+		const specData = await specRes.json();
 
-	function walk(node, parent) {
-		const p = allPokemon.find(x => x.name === node.species.name);
-		if (!p) return;
-		list.push(p);
-		parentMap[p.name] = parent || null;
-		childrenMap[p.name] = [];
-		if (parent) childrenMap[parent.name].push(p);
-		node.evolves_to.forEach(c => walk(c, p));
+		const chainRes = await fetchWithTimeout(specData.evolution_chain.url);
+		if (!chainRes.ok) throw new Error(`Chain API error: ${chainRes.status}`);
+		const chainData = await chainRes.json();
+		const list = [];
+		const parentMap = {},
+			childrenMap = {};
+
+		function walk(node, parent) {
+			const p = allPokemon.find(x => x.name === node.species.name);
+			if (!p) return;
+			list.push(p);
+			parentMap[p.name] = parent || null;
+			childrenMap[p.name] = [];
+			if (parent) childrenMap[parent.name].push(p);
+			node.evolves_to.forEach(c => walk(c, p));
+		}
+
+		walk(chainData.chain, null);
+		return {
+			allMembers: list,
+			parentMap,
+			childrenMap
+		};
+	} catch (e) {
+		console.warn('getEvolutionChain failed, using local fallback:', e);
+		return buildLocalEvolutionChain(pokemonId);
 	}
-	walk(chainData.chain, null);
-	return {
-		allMembers: list,
-		parentMap,
-		childrenMap
-	};
 }
 async function getGen1EvoSiblings(pokemonId) {
 	try {
@@ -2024,47 +2209,75 @@ function buildEvoOptions(evoQ) {
 }
 
 async function startGame() {
-	sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-	getCtx();
-	stopWhosThatAudio();
-	const rawName = document.getElementById('player-name').value.trim();
-	playClick();
-	playerName = rawName;
-	lsSet('pokemommy_trainer_name', rawName);
-	document.getElementById('start-btn').disabled = true;
-	document.getElementById('start-btn').textContent = 'Loading…';
-	if (!allPokemon.length) await loadPokemonList();
-	const shuffled = [...allPokemon].sort(() => Math.random() - .5);
-	const pool = quizMode === 'full' ? shuffled : shuffled.slice(0, QUICK_COUNT);
-	questions = pool.map(p => ({
-		correct: p,
-		options: null,
-		evoQ: null
-	}));
-	currentQ = 0;
-	correctCount = 0;
-	answeredCount = 0;
-	wrongAnswers = [];
-	_quizRunToken++;
-	_hintRequestToken++;
-	sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-	scoreSubmitted = false;
-	clearQuizTransientState();	
-	_scoreSubmitted = false;
-	document.getElementById('q-total').textContent = questions.length;
-	document.getElementById('player-display').textContent = playerName;
-	const genderImg = document.getElementById('trainer-gender-img');
-	if (genderImg) genderImg.src = playerGender === 'girl' ? 'img/girl_ow.png' : 'img/boy_ow.png';
-	document.getElementById('whos-section').style.display = quizType === 'whos' ? 'block' : 'none';
-	document.getElementById('identify-section').style.display = quizType === 'identify' ? 'block' : 'none';
-	document.getElementById('evo-section').style.display = quizType === 'evo' ? 'block' : 'none';
-	showScreen('game-screen');
-	await preloadQuestionImages(0, 2);
-	renderQuestion();
-	preloadQuestionImages(2, 4);
+  sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  getCtx();
+  stopWhosThatAudio();
 
+  const startBtn = document.getElementById("start-btn");
+  const rawName = document.getElementById("player-name").value.trim();
 
-	startTimer();
+  playClick();
+  playerName = rawName;
+  lsSet("pokemommytrainername", rawName);
+
+  startBtn.disabled = true;
+  startBtn.textContent = "Loading...";
+
+  try {
+    if (!allPokemon.length) {
+      const loaded = await loadPokemonList();
+      if (!loaded || !allPokemon.length) {
+        throw new Error("Pokemon list unavailable");
+      }
+    }
+
+    const shuffled = [...allPokemon].sort(() => Math.random() - 0.5);
+    const pool = quizMode === "full" ? shuffled : shuffled.slice(0, QUICK_COUNT);
+
+    questions = pool.map((p) => ({
+      correct: p,
+      options: null,
+      evoQ: null
+    }));
+
+    currentQ = 0;
+    correctCount = 0;
+    answeredCount = 0;
+    wrongAnswers = [];
+    _quizRunToken++;
+    _hintRequestToken++;
+    sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    scoreSubmitted = false;
+
+    clearQuizTransientState();
+    scoreSubmitted = false;
+
+    document.getElementById("q-total").textContent = questions.length;
+    document.getElementById("player-display").textContent = playerName;
+
+    const genderImg = document.getElementById("trainer-gender-img");
+    if (genderImg) {
+      genderImg.src = playerGender === "girl" ? "img/girl_ow.png" : "img/boy_ow.png";
+    }
+
+    document.getElementById("whos-section").style.display = quizType === "whos" ? "block" : "none";
+    document.getElementById("identify-section").style.display = quizType === "identify" ? "block" : "none";
+    document.getElementById("evo-section").style.display = quizType === "evo" ? "block" : "none";
+
+    showScreen("game-screen");
+    startTimer();
+    await renderQuestion();
+  } catch (err) {
+    console.error("startGame failed:", err);
+    clearAutoNext();
+    stopTimer();
+    unduckBgm();
+    clearQuizTransientState();
+    showScreen("welcome-screen");
+    showToast("Could not start the quiz. Please try again.");
+    startBtn.disabled = false;
+    startBtn.textContent = "Start Quiz!";
+  }
 }
 
 
@@ -2702,9 +2915,9 @@ async function openLearnDetail(pokemonId, fromBrowse = true) {
   if (requestToken !== _learnRequestToken || learnCurrentId !== pokemonId) return;
 
   try {
-    await buildEvolutionLine(specData.evolution_chain?.url, pokemonId);
+    await buildLearnEvoLine(pokemonId, specData);
   } catch (err) {
-    console.error('buildEvolutionLine failed:', err);
+    console.error('buildLearnEvoLine failed:', err);
     evoEl.innerHTML = '<div class="hint-card">Could not load evolution line.</div>';
   }
 }
@@ -3076,7 +3289,7 @@ function confirmGoHome() {
 			clearAutoNext();
 			unduckBgm();
 			wrongAnswers = [];
-			_scoreSubmitted = false;
+			scoreSubmitted = false;
 			currentQ = 0; correctCount = 0; answeredCount = 0;
 			difficulty = null;
             document.getElementById('btn-easy').classList.remove('selected');
@@ -3095,7 +3308,7 @@ stopTimer();
 clearAutoNext();
 unduckBgm();
 wrongAnswers = [];
-_scoreSubmitted = false;
+scoreSubmitted = false;
 clearQuizTransientState();
 _hintRequestToken++;
 _learnRequestToken++;

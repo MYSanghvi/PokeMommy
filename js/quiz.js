@@ -2634,6 +2634,9 @@ function checkAnswer(type, chosen, correct, btn) {
       if (b.dataset.name === correct) b.classList.add('correct');
     });
     fb.textContent = `❌ It was ${displayName(correct)}!`;
+    if (type === 'identify') {
+      fb.textContent = `No, that's not ${displayName(correct)}. It's ${displayName(chosen)}.`;
+    }
     fb.style.color = '#dc3545';
     playWrong();
   }

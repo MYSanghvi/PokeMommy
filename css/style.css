@@ -747,6 +747,9 @@ body:has(#result-screen[style*="block"]) {
 .footer-dedication-badge:hover .footer-dedication-ball {
   transform: rotate(360deg);
 }
+.footer-dedication-badge.is-spinning .footer-dedication-ball {
+  animation: footerDedicationSpin .6s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
 .footer-dedication-ball svg {
   width: 84%;
   height: 84%;
@@ -786,6 +789,11 @@ body:has(#result-screen[style*="block"]) {
   .footer-dedication-badge:hover .footer-dedication-ball {
     transform: none;
   }
+}
+
+@keyframes footerDedicationSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .screen { animation: fadeIn .35s ease; }

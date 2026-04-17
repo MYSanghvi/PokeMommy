@@ -507,5 +507,19 @@
 <script src="js/quiz.js"></script>
 <script src="js/leaderboard.js"></script>
 <script src="js/scorecard.js"></script>
+<script>
+  (function () {
+    const badge = document.querySelector('.footer-dedication-badge');
+    if (!badge) return;
+
+    const triggerSpin = () => {
+      badge.classList.remove('is-spinning');
+      void badge.offsetWidth;
+      badge.classList.add('is-spinning');
+    };
+
+    badge.addEventListener('click', triggerSpin);
+  }());
+</script>
 </body>
 </html>

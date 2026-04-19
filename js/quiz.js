@@ -598,14 +598,19 @@ function closeEasterEgg() {
   cleanupWifey();
   cleanupHelu();
 
+  // Dedication egg cleanup
+  const dedCv = document.getElementById('dedication-star-canvas');
+  if (dedCv) dedCv.remove();
+  if (dedicationTypeTimer) { clearInterval(dedicationTypeTimer); dedicationTypeTimer = null; }
+  const dedCard = document.getElementById('easter-card');
+  if (dedCard) dedCard.classList.remove('dedication-active');
+
   const overlay = byId('easter-overlay');
   if (overlay) {
     overlay.style.display = 'none';
-    overlay.classList.remove('maulish-active', 'wifey-active', 'helu-active');
+    overlay.classList.remove('maulish-active', 'wifey-active', 'helu-active', 'dedication-active');
   }
-
   setBodyScrollLocked(false);
-
   if (onEasterEggClose) {
     const fn = onEasterEggClose;
     onEasterEggClose = null;
@@ -1254,6 +1259,116 @@ function cleanupWifey() {
 	document.querySelectorAll('.wifey-ring,.wifey-petal').forEach(e=>e.remove());
 }
 
+
+// =============================================
+// DEDICATION BADGE — SECRET LETTER EGG
+// =============================================
+let dedicationTypeTimer = null;
+let dedicationTapCount = 0;
+let dedicationTapTimer = null;
+
+function playDedicationSound() {
+  const ctx = getCtx(), now = ctx.currentTime;
+  const reverb = maulishCreateReverb(ctx, 3.0, 2.0);
+  const rvg = ctx.createGain(); rvg.gain.value = 0.4;
+  reverb.connect(rvg); rvg.connect(ctx.destination);
+
+  const notes = [523.25, 659.25, 783.99, 659.25, 523.25, 587.33, 523.25];
+  notes.forEach((freq, i) => {
+    const t = now + i * 0.32;
+    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.18, t + 0.04);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    o.connect(g); g.connect(ctx.destination); g.connect(reverb);
+    o.start(t); o.stop(t + 0.6);
+  });
+
+  for (let i = 0; i < 6; i++) {
+    const t = now + 0.8 + i * 0.18;
+    const o = ctx.createOscillator(); o.type = 'triangle';
+    o.frequency.value = 1200 + Math.random() * 1800;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.08, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.connect(g); g.connect(ctx.destination); g.connect(reverb);
+    o.start(t); o.stop(t + 0.35);
+  }
+
+  [0, 0.5].forEach(t => {
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(70, now + 2.2 + t);
+    o.frequency.exponentialRampToValueAtTime(40, now + 2.5 + t);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, now + 2.2 + t);
+    g.gain.linearRampToValueAtTime(0.6, now + 2.24 + t);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 2.6 + t);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(now + 2.2 + t); o.stop(now + 2.7 + t);
+  });
+}
+
+function triggerDedicationEgg() {
+  if (dedicationTapTimer) clearTimeout(dedicationTapTimer);
+  dedicationTapTimer = setTimeout(() => { dedicationTapCount = 0; }, 4000);
+
+  dedicationTapCount++;
+  playClick();
+
+  if (dedicationTapCount < 9) return;
+
+  // 9th tap — fire the egg
+  dedicationTapCount = 0;
+  clearTimeout(dedicationTapTimer);
+
+  playDedicationSound();
+  vibrate([40, 20, 40, 20, 80]);
+
+  const emojiEl = document.getElementById('easter-emoji');
+  const titleEl = document.getElementById('easter-title');
+  const bodyEl  = document.getElementById('easter-body');
+  const overlay = document.getElementById('easter-overlay');
+  const card    = document.getElementById('easter-card');
+
+  const starCv = document.createElement('canvas');
+  starCv.id = 'dedication-star-canvas';
+  starCv.style.cssText = 'position:fixed;inset:0;z-index:9986;pointer-events:none;opacity:0;transition:opacity 1s ease';
+  document.body.append(starCv);
+  setTimeout(() => { starCv.style.opacity = '1'; wifeyInitCanvas(starCv); }, 80);
+
+  card.classList.add('dedication-active');
+  overlay.classList.add('dedication-active');
+
+  emojiEl.textContent = '💌';
+  titleEl.textContent = 'Note in a Ball';
+  bodyEl.textContent = '';
+
+  overlay.style.display = 'flex';
+  setBodyScrollLocked(true);
+
+  const message = "You found this… hidden inside a Poké Ball. This whole journey was made with you in mind. Every question, every detail, every little moment and with our little one on the way. Through late nights, fixing issues, and teaching myself things I never thought I’d learn, I’ve done it all… and I’d do it all again without hesitation for our new Trainer and the adventure we’re about to begin together. In a world full of countless encounters, finding you feels like a once-in-a-lifetime moment - a rare Shiny I’ll always treasure. I’m really glad our paths crossed, and even more excited for the journey ahead with you, and with the little one who’s about to join our team!";
+
+  setTimeout(() => {
+    if (dedicationTypeTimer) clearInterval(dedicationTypeTimer);
+    let i = 0;
+    dedicationTypeTimer = setInterval(() => {
+      bodyEl.textContent += message[i++];
+      if (i >= message.length) clearInterval(dedicationTypeTimer);
+    }, 28);
+  }, 400);
+
+  setTimeout(() => {
+    confetti({ particleCount: 40, spread: 60, origin: { x: 0.5, y: 0.4 },
+      colors: ['#ffb6c1','#ff69b4','#FFD700','#fff','#ffc0cb'], gravity: 0.4 });
+  }, 600);
+}
+
+// =============================================
+// DEDICATION BADGE ENDS
+// =============================================
+
+
 // ══════════════════════════════════════
 // HELU — GAMEBOY
 // ══════════════════════════════════════
@@ -1501,7 +1616,7 @@ window.addEventListener('load', () => {
 function checkNightMode() {
   if (document.body.classList.contains('night-mode')) return;
   const h = new Date().getHours();
-  if (h >= 23 || h < 4) {
+  if (h >= 11 || h < 4) {
 	// ── Block all interaction for the entire night-mode sequence ──
     const nightBlocker = document.createElement('div');
     nightBlocker.id = 'night-mode-blocker';
@@ -2161,8 +2276,9 @@ async function loadPokemonList() {
 }
 
 async function getEvolutionChain(pokemonId) {
-	try {
-		const specRes = await fetchWithTimeout(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
+  if (!allPokemon.length) allPokemon = buildLocalPokemonList(); // ensure list is ready
+  try {
+    const specRes = await fetchWithTimeout(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
 		if (!specRes.ok) throw new Error(`Species API error: ${specRes.status}`);
 		const specData = await specRes.json();
 
@@ -2267,77 +2383,75 @@ async function startGame() {
   getCtx();
   stopWhosThatAudio();
 
-  const startBtn = document.getElementById("start-btn");
-  const rawName = document.getElementById("player-name").value.trim();
-
+  const startBtn = document.getElementById('start-btn');
+  const rawName = document.getElementById('player-name').value.trim();
   playClick();
   playerName = rawName;
-  lsSet("pokemommytrainername", rawName);
+  lsSet('pokemommy-trainername', rawName);
 
+  // Disable the start button AND all mode/difficulty buttons while loading
   startBtn.disabled = true;
-  startBtn.textContent = "Loading...";
+  startBtn.textContent = 'Loading...';
+  const btnQuick = document.getElementById('btn-quick');
+  const btnFull  = document.getElementById('btn-full');
+  const btnEasy  = document.getElementById('btn-easy');
+  const btnHard  = document.getElementById('btn-hard');
+  if (btnQuick) btnQuick.disabled = true;
+  if (btnFull)  btnFull.disabled  = true;
+  if (btnEasy)  btnEasy.disabled  = true;
+  if (btnHard)  btnHard.disabled  = true;
 
   try {
+    // Use local hardcoded list — no API call needed
     if (!allPokemon.length) {
-      const loaded = await loadPokemonList();
-      if (!loaded || !allPokemon.length) {
-        throw new Error("Pokemon list unavailable");
-      }
+      allPokemon = buildLocalPokemonList();
     }
 
     const shuffled = [...allPokemon].sort(() => Math.random() - 0.5);
-    const pool = quizMode === "full" ? shuffled : shuffled.slice(0, QUICK_COUNT);
-
-    questions = pool.map((p) => ({
-      correct: p,
-      options: null,
-      evoQ: null
-    }));
-
-    currentQ = 0;
-    correctCount = 0;
-    answeredCount = 0;
-    wrongAnswers = [];
-    _quizRunToken++;
-    _hintRequestToken++;
-    sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const pool = quizMode === 'full' ? shuffled : shuffled.slice(0, 20);
+    questions = pool.map(p => ({ correct: p, options: null, evoQ: null }));
+    currentQ = 0; correctCount = 0; answeredCount = 0; wrongAnswers = [];
+    quizRunToken = hintRequestToken = sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
     scoreSubmitted = false;
-
     clearQuizTransientState();
     scoreSubmitted = false;
 
-    document.getElementById("q-total").textContent = questions.length;
-    document.getElementById("player-display").textContent = playerName;
+    document.getElementById('q-total').textContent = questions.length;
+    document.getElementById('player-display').textContent = playerName;
+    const genderImg = document.getElementById('trainer-gender-img');
+    if (genderImg) genderImg.src = playerGender === 'girl' ? 'img/girl_ow.png' : 'img/boy_ow.png';
 
-    const genderImg = document.getElementById("trainer-gender-img");
-    if (genderImg) {
-      genderImg.src = playerGender === "girl" ? "img/girl_ow.png" : "img/boy_ow.png";
-    }
+    document.getElementById('whos-section').style.display     = quizType === 'whos'     ? 'block' : 'none';
+    document.getElementById('identify-section').style.display = quizType === 'identify' ? 'block' : 'none';
+    document.getElementById('evo-section').style.display      = quizType === 'evo'      ? 'block' : 'none';
 
-    document.getElementById("whos-section").style.display = quizType === "whos" ? "block" : "none";
-    document.getElementById("identify-section").style.display = quizType === "identify" ? "block" : "none";
-    document.getElementById("evo-section").style.display = quizType === "evo" ? "block" : "none";
-
-    const initialPreloadCount = quizMode === "full" ? Math.min(24, questions.length) : questions.length;
-    await preloadQuestionImages(0, initialPreloadCount);
-
-    showScreen("game-screen");
+    // Preload Q1 only, then show the screen immediately
+    await preloadQuestionImages(0, 1);
+    showScreen('game-screen');
     startTimer();
     await renderQuestion();
 
-    if (initialPreloadCount < questions.length) {
-      void preloadQuestionImages(initialPreloadCount, questions.length - initialPreloadCount);
+    // Preload the rest lazily in the background (non-blocking)
+    if (questions.length > 1) {
+      void preloadQuestionImages(1, questions.length - 1);
     }
+
   } catch (err) {
-    console.error("startGame failed:", err);
+    console.error('startGame failed', err);
     clearAutoNext();
     stopTimer();
     unduckBgm();
     clearQuizTransientState();
-    showScreen("welcome-screen");
-    showToast("Could not start the quiz. Please try again.");
+    showScreen('welcome-screen');
+    showToast('Could not start the quiz. Please try again.');
+  } finally {
+    // Always re-enable all buttons when done (whether success or error)
     startBtn.disabled = false;
-    startBtn.textContent = "Start Quiz!";
+    startBtn.textContent = 'Start Quiz!';
+    if (btnQuick) btnQuick.disabled = false;
+    if (btnFull)  btnFull.disabled  = false;
+    if (btnEasy)  btnEasy.disabled  = false;
+    if (btnHard)  btnHard.disabled  = false;
   }
 }
 

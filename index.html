@@ -489,14 +489,17 @@
                                                   .....-+*-....                                     
                                                     ..........-->
   
-  <div class="footer-dedication-badge" role="note" aria-label="Created by MaulishMaster, for my wife and our little future Pokémon Trainer she's carrying.">
-    <div class="footer-dedication-ball" aria-hidden="true">
-      <svg viewBox="0 0 59 59" aria-hidden="true">
-        <use href="#footer-pokeball-icon"></use>
-      </svg>
-    </div>
-    <span class="footer-dedication-text">Created by MaulishMaster, for my wife and<br>our little future Pokémon Trainer she's carrying.</span>
+  <div class="footer-dedication-badge" role="button" tabindex="0"
+     aria-label="Created by MaulishMaster, for my wife and our little future Pokémon Trainer she's carrying."
+     onclick="triggerDedicationEgg()"
+     onkeydown="if(event.key==='Enter'||event.key===' ')triggerDedicationEgg()">
+  <div class="footer-dedication-ball" aria-hidden="true">
+    <svg viewBox="0 0 59 59" aria-hidden="true">
+      <use href="#footer-pokeball-icon"></use>
+    </svg>
   </div>
+  <span class="footer-dedication-text">Created by MaulishMaster, for my wife and<br>our little future Pokémon Trainer she's carrying.</span>
+</div>
   <div class="disclaimer">
     Pokémon and all respective names are trademarks and © of Nintendo, Game Freak, and Creatures Inc.<br/>
     This is a non-commercial fan project and is not affiliated with or endorsed by The Pokémon Company.

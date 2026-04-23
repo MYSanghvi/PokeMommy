@@ -1,446 +1,605 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
-<link rel="shortcut icon" href="favicon/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-title" content="PokeMommy" />
-<link rel="manifest" href="favicon/site.webmanifest" />
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PokeMommy - Gotta train 'em all</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<link rel="stylesheet" href="css/style.css"/>
-</head>
-<body>
-<!-- ── Welcome Message Starts ── -->
+  <head>
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="PokeMommy" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PokeMommy - Gotta train 'em all</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- ── Welcome Message Starts ── -->
 
-<div id="welcome-popup" style="display:none; position:fixed; inset:0; z-index:9999;
+    <div
+      id="welcome-popup"
+      style="display:none; position:fixed; inset:0; z-index:9999;
   background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
-  justify-content:center; align-items:center; padding:20px;">
-  <div style="background:#fff; border-radius:20px; max-width:360px; width:100%;
+  justify-content:center; align-items:center; padding:20px;"
+    >
+      <div
+        style="background:#fff; border-radius:20px; max-width:360px; width:100%;
     padding:28px 24px; box-shadow:0 8px 40px rgba(0,58,112,0.25);
-    font-family:'Flexo',sans-serif; text-align:center; position:relative;">
-    
-    <div style="font-size:40px; margin-bottom:8px;"><img src="img/oak.png" alt="Professor Oak" style="width:80px;height:80px;object-fit:contain;"></div>
-    <h2 style="color:#003A70; font-size:20px; margin:0 0 6px;">
-      Welcome to the <br> world of POKéMON!
-    </h2>
-    
+    font-family:'Flexo',sans-serif; text-align:center; position:relative;"
+      >
+        <div style="font-size:40px; margin-bottom:8px;">
+          <img src="img/oak.png" alt="Professor Oak" style="width:80px;height:80px;object-fit:contain;" />
+        </div>
+        <h2 style="color:#003A70; font-size:20px; margin:0 0 6px;">
+          Welcome to the <br />
+          world of POKéMON!
+        </h2>
 
-    <p style="color:#444; font-size:13.5px; line-height:1.65; margin:0 0 14px;">
-      This game was built for one special person - but every trainer is welcome here. 
-      Whether you grew up with a Pokédex or just discovered it, this is your world now.
-    </p>
+        <p style="color:#444; font-size:13.5px; line-height:1.65; margin:0 0 14px;">
+          This game was built for one special person - but every trainer is welcome here. Whether you grew up with a
+          Pokédex or just discovered it, this is your world now.
+        </p>
 
-    <div style="background:#f0f6ff; border-radius:12px; padding:12px 14px;
-      margin-bottom:14px; text-align:left;">
-      <p style="margin:0 0 6px; font-size:12px; font-weight:700;
-        color:#003A70; text-transform:uppercase; letter-spacing:0.5px;">
-        🕵️ Trainer Tip
-      </p>
-      <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
-        Some trainer names unlock <em>special surprises</em>. 
-        Try names like <strong>Ash</strong>, <strong>Brock</strong>, or maybe your own legendary alias…</p>
-    </div>
+        <div
+          style="background:#f0f6ff; border-radius:12px; padding:12px 14px;
+      margin-bottom:14px; text-align:left;"
+        >
+          <p
+            style="margin:0 0 6px; font-size:12px; font-weight:700;
+        color:#003A70; text-transform:uppercase; letter-spacing:0.5px;"
+          >
+            🕵️ Trainer Tip
+          </p>
+          <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
+            Some trainer names unlock <em>special surprises</em>. Try names like <strong>Ash</strong>,
+            <strong>Brock</strong>, or maybe your own legendary alias…
+          </p>
+        </div>
 
-    <div style="background:#fffbf0; border:1px dashed #FFCB05; border-radius:12px;
-      padding:12px 14px; margin-bottom:20px; text-align:left;">
-      <p style="margin:0 0 4px; font-size:12px; font-weight:700;
-        color:#b8860b; text-transform:uppercase; letter-spacing:0.5px;">
-        🥚 Hidden Easter Eggs
-      </p>
-      <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
-        There are secrets scattered all over this quiz. 
-        The greatest trainers don't just play. They <strong>discover</strong>. Will you?
-      </p>
-    </div>
+        <div
+          style="background:#fffbf0; border:1px dashed #FFCB05; border-radius:12px;
+      padding:12px 14px; margin-bottom:20px; text-align:left;"
+        >
+          <p
+            style="margin:0 0 4px; font-size:12px; font-weight:700;
+        color:#b8860b; text-transform:uppercase; letter-spacing:0.5px;"
+          >
+            🥚 Hidden Easter Eggs
+          </p>
+          <p style="margin:0; font-size:13px; color:#555; line-height:1.6;">
+            There are secrets scattered all over this quiz. The greatest trainers don't just play. They
+            <strong>discover</strong>. Will you?
+          </p>
+        </div>
 
-    <button onclick="closeWelcomePopup()"
-      style="background:#3D7DCA; color:#fff; border:none; border-radius:12px;
+        <button
+          onclick="closeWelcomePopup()"
+          style="background:#3D7DCA; color:#fff; border:none; border-radius:12px;
       padding:13px 0; width:100%; font-size:15px; font-weight:700;
       font-family:'Flexo',sans-serif; cursor:pointer; letter-spacing:0.3px;
-      transition:background 0.2s;">
-      Continue
-    </button>
-
-  </div>
-</div>
-
-
-<!-- ── Welcome Message Ends ── -->
-
-<!-- Trainer Name Popup -->
-<div id="name-popup" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; font-family:Flexo,sans-serif;">
-  <div style="background:#fff; border-radius:20px; padding:32px 28px; max-width:340px; width:90%; text-align:center; box-shadow:0 8px 40px rgba(0,58,112,0.25);">
-    <div style="font-size:40px; margin-bottom:10px;"><img src="img/oak.png" alt="Professor Oak" style="width:80px;height:80px;object-fit:contain;"></div>
-    <h2 style="color:#003A70; font-size:20px; margin:0 0 6px;">What's your Trainer name?</h2>
-    <p style="color:#555; font-size:13px; margin:0 0 18px; line-height:1.5;">You can change it anytime by refreshing the page.</p>
-    <input id="name-popup-input" type="text" placeholder="Enter your name…" maxlength="20"
-      style="width:100%; box-sizing:border-box; padding:12px 14px; border:2px solid #dde3ee; border-radius:10px; font-size:15px; font-family:Flexo,sans-serif; outline:none; color:#003A70; margin-bottom:14px;"
-      oninput="checkNamePopupReady()" onkeydown="if(event.key==='Enter')confirmTrainerName()">
-    <div style="display:flex;gap:12px;margin-bottom:16px;">
-  <button id="gender-boy" onclick="selectGender('boy')" style="flex:1;padding:12px 8px;border:2px solid #3D7DCA;border-radius:10px;background:#3D7DCA;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Roboto',sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px;">
-    <img src="img/boy_ow.png" style="width:28px;height:28px;object-fit:contain;image-rendering:pixelated;">Boy
-  </button>
-  <button id="gender-girl" onclick="selectGender('girl')" style="flex:1;padding:12px 8px;border:2px solid #ddd;border-radius:10px;background:#f9f9f9;color:#666;font-size:13px;font-weight:700;cursor:pointer;font-family:'Roboto',sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px;">
-    <img src="img/girl_ow.png" style="width:28px;height:28px;object-fit:contain;image-rendering:pixelated;">Girl
-  </button>
-</div>
-<button id="name-popup-btn" onclick="confirmTrainerName()" disabled
-      style="width:100%; background:#FFCB05; color:#003A70; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; font-family:Flexo,sans-serif; opacity:0.5;">
-      Begin Journey!
-    </button>
-	<p style="margin:10px 0 0; font-size:11px; color:#aaa;">
-      Your very own adventure is about to unfold!
-    </p>
-  </div>
-</div>
-<!-- Trainer Name Popup Ends-->
-
-<!-- ── Easter Egg Overlay ── -->
-<!-- Easter Egg Overlay -->
-<div id="easter-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.82); align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:32px; font-family:Flexo,sans-serif; color:#fff;">
-  <div id="easter-card" style="position:relative; display:flex; flex-direction:column; align-items:center;">
-    <div id="easter-emoji" style="font-size:64px; margin-bottom:16px;"></div>
-    <div id="easter-title" style="font-size:22px; font-weight:700; margin-bottom:10px; color:#FFCB05;"></div>
-    <div id="easter-body" style="font-size:14px; line-height:1.7; color:#eee; max-width:320px;"></div>
-    <button id="easter-close" onclick="closeEasterEgg()" style="margin-top:28px; background:#FFCB05; color:#003A70; border:none; border-radius:10px; padding:12px 28px; font-size:14px; font-weight:700; cursor:pointer; font-family:Flexo,sans-serif;">Got it!</button>
-  </div>
-</div>
-
-<button class="gear-toggle" id="gear-toggle" onclick="playClick(); openSettings()" title="Settings">⚙️</button>
-
-
-<div class="card">
-
-  <!-- ══════════ LANDING ══════════ -->
-  <div id="landing-screen" class="screen">
-    <img src="img/pokemommy_logo.png" alt="PokeMommy" class="landing-logo" id="landing-logo"/>
-    <p class="landing-subtitle">Gotta train 'em all</p>
-    
-    <div class="quiz-type-grid">
-      <button class="quiz-type-btn" onclick="openLearn()">
-        <span class="qt-icon"><img class="qt-svg-img" src="img/pokedex.svg"></span>
-        <span class="qt-text">
-          <span class="qt-title">Pokédex</span>
-          <span class="qt-desc">Browse every Pokémon, explore types, Pokédex entries, and evolution chains.</span>
-        </span>
-        <span class="qt-arrow">›</span>
-      </button>
-      <button class="quiz-type-btn" onclick="goToWelcome('identify')">
-        <span class="qt-icon"><img class="qt-svg-img" src="img/identify.svg"></span>
-        <span class="qt-text">
-          <span class="qt-title">Identify the Pokémon</span>
-          <span class="qt-desc">A Pokémon name appears; pick the correct image from four options given.</span>
-        </span>
-        <span class="qt-arrow">›</span>
-      </button>
-      <button class="quiz-type-btn" onclick="goToWelcome('evo')">
-        <span class="qt-icon"><img class="qt-svg-img" src="img/evolution.svg"></span>
-        <span class="qt-text">
-          <span class="qt-title">Spot the Evolution</span>
-          <span class="qt-desc">A Pokémon is shown; choose its evolution or pre-evolution from options.</span>
-        </span>
-        <span class="qt-arrow">›</span>
-      </button>
-      <button class="quiz-type-btn" onclick="goToWelcome('whos')">
-        <span class="qt-icon"><img class="qt-svg-img" src="img/who_pokemon.svg"></span>
-        <span class="qt-text">
-          <span class="qt-title">Who's That Pokémon?</span>
-          <span class="qt-desc">A Pokémon appears; select the correct name from the four given options.</span>
-        </span>
-        <span class="qt-arrow">›</span>
-      </button>
-	  
-	  <!-- ── Coming Soon Divider ─────────────────────────────────── -->
-<div class="quiz-section-divider">
-  <span>The Road Ahead</span>
-</div>
-
-<!-- ── Gym Battles (Coming Soon) ──────────────────────────── -->
-<button class="quiz-type-btn" id="gym-battles-btn" onclick="gymBattleTap()" title="Gym Battles">
-    <span class="qt-icon"><img class="qt-svg-img" src="img/gym_trainer.svg"></span>
-    <span class="qt-text">
-        <span class="qt-title">Gym Battles<span class="qt-coming-soon-badge" id="gym-coming-soon-badge" style="display:none">Coming Soon</span></span>
-        <span class="qt-desc">Earn badges by mastering Pokémon and their unique types and specialties.</span>
-    </span>
-    <span class="qt-arrow">›</span>
-</button>
-	  
-    </div>
-  </div>
-
-  <!-- ══════════ WELCOME ══════════ -->
-  <div id="welcome-screen" class="screen">
-    <button class="back-link" onclick="goHome()">‹ Back</button>
-    <h1 id="welcome-title">Who's That Pokémon?</h1>
-    <input type="hidden" id="player-name" placeholder="Brock / Misty" maxlength="20"/>
-    <label>Quiz Mode</label>
-    <div class="toggle-row">
-      <button class="toggle-btn active" id="btn-quick" onclick="selectMode('quick')">
-        Quick Test<br/><span style="font-size:11px;font-weight:400;">20 Questions</span>
-      </button>
-      <button class="toggle-btn" id="btn-full" onclick="selectMode('full')">
-        Full Pokédex<br/><span style="font-size:11px;font-weight:400;">All 151</span>
-      </button>
-    </div>
-    <label>Difficulty</label>
-    <div class="difficulty-row">
-      <button class="diff-btn" id="btn-easy" onclick="selectDiff('easy')">
-        <span class="icon">🌟</span>Easy
-        <br/><small style="font-weight:400;font-size:11px" id="easy-desc">Full sprite shown</small>
-      </button>
-      <button class="diff-btn" id="btn-hard" onclick="selectDiff('hard')">
-        <span class="icon">🌑</span>Hard
-        <br/><small style="font-weight:400;font-size:11px" id="hard-desc">Silhouette only</small>
-      </button>
-    </div>
-    <button class="start-btn" id="start-btn" onclick="startGame()" disabled>Start Quiz!</button>
-  </div>
-
-  <!-- ══════════ GAME ══════════ -->
-  <div id="game-screen" class="screen">
-    <div class="top-bar">
-  <div class="top-row-1">
-    <button class="topbar-back-btn" onclick="confirmGoHome()" title="Quit quiz">&#8592; Quit</button>
-    <button class="reset-btn" onclick="confirmReset()">&#8635; Reset</button>
-  </div>
-  <div class="top-row-2">
-    <div class="top-trainer">
-      <img id="trainer-gender-img" src="img/boy_ow.png" style="width:22px;height:22px;object-fit:contain;image-rendering:pixelated">
-      <span class="trainer" id="player-display"></span>
-    </div>
-    <span class="q-counter">Q<span id="q-num">1</span>/<span id="q-total">20</span></span>
-    <span class="acc-inline">Acc <span id="accuracy-display">—</span></span>
-    <span class="timer-display" id="timer-display">0m 00s</span>
-  </div>
-</div>
-
-    <div class="progress-wrap">
-      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-   
-
-    <!-- WHO'S THAT -->
-    <div id="whos-section">
-    <div class="pokemon-img-wrap">
-	<div class="img-skeleton" id="whos-skeleton"></div>
-	<div class="spinner" id="spinner"></div>
-	<img id="pokemon-img" src="" alt="Who's that Pokémon?">
-    </div>
-      <p class="question-label">Who's that Pokémon?</p>
-      <div class="options-grid" id="options-grid"></div>
-    </div>
-
-    <!-- IDENTIFY -->
-    <div id="identify-section">
-      <p class="question-label" style="margin-bottom:6px;">Which one is…</p>
-      <div class="identify-name" id="identify-name"></div>
-      <div class="img-options-grid" id="img-options-grid"></div>
-    </div>
-
-    <!-- EVOLUTION -->
-    <div id="evo-section">
-    <div class="evo-visual-row" id="evo-visual-row"></div>
-    <div class="evo-question-img-wrap" id="evo-question-img-wrap">
-    <div class="img-skeleton" id="evo-skeleton"></div>
-    <div class="evo-spinner" id="evo-spinner"></div>
-    <img id="evo-pokemon-img" src="" alt="">
-
-      </div>
-      <div class="evo-options-grid" id="evo-options-grid"></div>
-    </div>
-
-    <p class="feedback-msg" id="feedback-msg"></p>
-    <div class="hint-section">
-      <div class="hint-row">
-        <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)">
-          <span class="hint-icon">🏷️</span>Hint 1
-        </button>
-        <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)" disabled>
-          <span class="hint-icon">⚡</span>Hint 2
-        </button>
-        <button class="hint-btn" id="hint-btn-3" onclick="revealHint(3)" disabled>
-          <span class="hint-icon">📖</span>Hint 3
+      transition:background 0.2s;"
+        >
+          Continue
         </button>
       </div>
-      <div class="hint-cards" id="hint-cards"></div>
     </div>
-    <button class="next-btn" id="next-btn" style="display:none" onclick="nextQuestion()">Next →</button>
-  </div>
 
-  <!-- ══════════ RESULTS ══════════ -->
-  <div id="result-screen" class="screen">
-    <div class="result-emoji" id="result-emoji">🏆</div>
-    <p class="result-name"  id="result-player-name"></p>
-    <div class="result-pct" id="result-pct"></div>
-    <p class="result-sub"   id="result-score-sub"></p>
-    <p class="result-time"  id="result-time"></p>
-    <p class="result-msg"   id="result-msg"></p>
-    <p class="lb-submit-status" id="lb-submit-status"></p>
-    <button class="restart-btn" onclick="restartGame()">Play Again</button>
-    <button class="leaderboard-btn" onclick="showLeaderboard()">Leaderboard</button>
-    <button class="share-btn" id="share-btn" onclick="shareScore()">Share Score</button>
-    <button class="home-btn" onclick="goHome()">Choose a Different Quiz</button>
-	<div id="review-section" style="display:none"></div>
-  </div>
+    <!-- ── Welcome Message Ends ── -->
 
-  <!-- ══════════ LEADERBOARD ══════════ -->
-  <div id="leaderboard-screen" class="screen" style="display:none">
-  <button class="back-link" onclick="closeLeaderboard()">‹ Back to Results</button>
-  <h2 class="lb-title" id="lb-title">🏆 Leaderboard</h2>
-  <div id="lb-table-wrap" class="lb-table-wrap"></div>
-</div>
-
-  <!-- ══════════ POKÉDEX — BROWSE ══════════ -->
-  <div id="learn-browse-screen" class="screen" style="display:none">
-    <button class="back-link" onclick="goHome()">‹ Back</button>
-    <h1 class="learn-browse-title">Pokédex</h1>
-    <input type="text" id="learn-search" placeholder="Search Pokémon…" oninput="filterLearnList()" style="margin-bottom:20px;"/>
-    <div id="learn-grid" class="learn-grid"></div>
-  </div>
-
-  <!-- ══════════ POKÉDEX — DETAIL ══════════ -->
-  <div id="learn-detail-screen" class="screen" style="display:none">
-    <div class="learn-detail-topbar">
-      <button class="back-link" style="margin-bottom:0" onclick="learnGoBack()">‹ Back</button>
-      <span class="learn-detail-num" id="learn-detail-num">#001</span>
-    </div>
-    <div class="learn-nav-row">
-      <button class="learn-nav-btn" id="learn-nav-prev" onclick="learnNavigate(-1)">‹ Prev</button>
-      <button class="learn-nav-btn" id="learn-nav-next" onclick="learnNavigate(1)">Next ›</button>
-    </div>
-    <div class="swipe-hint" id="swipe-hint">‹ swipe to navigate ›</div>
-    <div class="learn-sprite-wrap">
-      <div class="spinner" id="learn-spinner"></div>
-      <img id="learn-sprite" src="" alt=""/>
-    </div>
-    <div class="learn-name-row">
-      <span class="learn-detail-name" id="learn-detail-name">Bulbasaur</span>
-      <button class="learn-speaker-btn" id="learn-speaker-btn" onclick="playLearnAudio()" title="Hear pronunciation">🔊</button>
-    </div>
-    <div class="learn-info-grid">
-      <div class="learn-info-card">
-        <div class="learn-info-label">Category</div>
-        <div class="learn-info-value" id="learn-category">—</div>
-      </div>
-      <div class="learn-info-card">
-        <div class="learn-info-label">Type</div>
-        <div class="learn-info-value" id="learn-type">—</div>
+    <!-- Trainer Name Popup -->
+    <div
+      id="name-popup"
+      style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; font-family:Flexo,sans-serif;"
+    >
+      <div
+        style="background:#fff; border-radius:20px; padding:32px 28px; max-width:340px; width:90%; text-align:center; box-shadow:0 8px 40px rgba(0,58,112,0.25);"
+      >
+        <div style="font-size:40px; margin-bottom:10px;">
+          <img src="img/oak.png" alt="Professor Oak" style="width:80px;height:80px;object-fit:contain;" />
+        </div>
+        <h2 style="color:#003A70; font-size:20px; margin:0 0 6px;">What's your Trainer name?</h2>
+        <p style="color:#555; font-size:13px; margin:0 0 18px; line-height:1.5;">
+          You can change it anytime by refreshing the page.
+        </p>
+        <input
+          id="name-popup-input"
+          type="text"
+          placeholder="Enter your name…"
+          maxlength="20"
+          style="width:100%; box-sizing:border-box; padding:12px 14px; border:2px solid #dde3ee; border-radius:10px; font-size:15px; font-family:Flexo,sans-serif; outline:none; color:#003A70; margin-bottom:14px;"
+          oninput="checkNamePopupReady()"
+          onkeydown="if(event.key==='Enter')confirmTrainerName()"
+        />
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <button
+            id="gender-boy"
+            onclick="selectGender('boy')"
+            style="flex:1;padding:12px 8px;border:2px solid #3D7DCA;border-radius:10px;background:#3D7DCA;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Roboto',sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px;"
+          >
+            <img src="img/boy_ow.png" style="width:28px;height:28px;object-fit:contain;image-rendering:pixelated;" />Boy
+          </button>
+          <button
+            id="gender-girl"
+            onclick="selectGender('girl')"
+            style="flex:1;padding:12px 8px;border:2px solid #ddd;border-radius:10px;background:#f9f9f9;color:#666;font-size:13px;font-weight:700;cursor:pointer;font-family:'Roboto',sans-serif;display:flex;flex-direction:column;align-items:center;gap:4px;"
+          >
+            <img
+              src="img/girl_ow.png"
+              style="width:28px;height:28px;object-fit:contain;image-rendering:pixelated;"
+            />Girl
+          </button>
+        </div>
+        <button
+          id="name-popup-btn"
+          onclick="confirmTrainerName()"
+          disabled
+          style="width:100%; background:#FFCB05; color:#003A70; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; font-family:Flexo,sans-serif; opacity:0.5;"
+        >
+          Begin Journey!
+        </button>
+        <p style="margin:10px 0 0; font-size:11px; color:#aaa;">Your very own adventure is about to unfold!</p>
       </div>
     </div>
-    <div class="learn-dex-entry" id="learn-dex-entry">Loading Pokédex entry…</div>
-    <div class="learn-evo-section">
-      <div class="learn-section-label">Evolution Chain</div>
-      <div class="learn-evo-line" id="learn-evo-line"></div>
-    </div>
-  </div>
+    <!-- Trainer Name Popup Ends-->
 
-</div><!-- /.card -->
-
-<!-- Settings Overlay -->
-<div id="settings-overlay" onclick="handleSettingsOverlayClick(event)">
-  <div class="s-sheet">
-    <div class="s-title-row">
-  <div class="s-title">Settings</div>
-  <button class="s-close-btn" onclick="closeSettings()" title="Close">✕</button>
-</div>
-
-    <!-- Generation -->
-    <div class="s-label">Generation</div>
-    <div class="s-gen-chips">
-  <div class="s-gen-chip s-mandatory" onclick="showToast('You can\'t leave the Kanto region just yet!')">
-    <div class="s-chip-check">&#10003;</div>Gen I · Kanto
-  </div>
-  <div class="s-gen-chip s-locked" onclick="showToast('This region is still locked. New Pokémon will appear soon!')">
-    <div class="s-chip-check"></div> Gen II · Johto
-  </div>
-  <div class="s-gen-chip s-locked" onclick="showToast('This region is still locked. New Pokémon will appear soon!')">
-    <div class="s-chip-check"></div> Gen III · Hoenn
-  </div>
-  <div class="s-gen-chip s-locked" onclick="showToast('This region is still locked. New Pokémon will appear soon!')">
-    <div class="s-chip-check"></div> Gen IV · Sinnoh
-  </div>
-</div>
-  <!--<div class="s-gen-note">ℹ️ These regions are still locked. New Pokémon will appear soon!</div>-->
-
-    <!-- Sound -->
-    <div class="s-label">Sound</div>
-    <div class="s-sound-row">
-      <div class="s-sound-card" id="s-sfx-card">
-        <div class="s-sound-lbl">Sound Effects <span class="s-sound-val" id="s-sfx-val">70%</span></div>
-        <input type="range" id="s-sfx-slider" min="0" max="100" value="70" style="--pct:70%"
-               oninput="onSettingsSlider('sfx', this.value)">
-      </div>
-      <div class="s-sound-card" id="s-music-card">
-        <div class="s-sound-lbl">Background Music <span class="s-sound-val" id="s-music-val">50%</span></div>
-        <input type="range" id="s-music-slider" min="0" max="100" value="50" style="--pct:50%"
-               oninput="onSettingsSlider('music', this.value)">
-      </div>
-    </div>
-    <div class="s-duck-row">
-      <label class="s-duck-label" id="s-duck-row" for="s-auto-duck">Auto-dim background music during quiz</label>
-      <label class="s-toggle-switch">
-        <input type="checkbox" id="s-auto-duck" checked>
-        <div class="s-toggle-track"></div>
-      </label>
-    </div>
-
-    <!-- Visual Style -->
-    <div class="s-label">Visual Style</div>
-    <div class="s-sprite-grid" id="s-sprite-grid">
-      <div class="s-sprite-btn" data-style="hd" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-     <!--     <span class="s-sprite-icon">✨</span> -->
-        <span class="s-sprite-name">HD Animated 3D</span>
-        <span class="s-sprite-desc">Lively high-def Pokémon animations</span>
-        <span class="s-sprite-tick">✓ Selected</span>
-      </div>
-      <div class="s-sprite-btn selected" data-style="sd" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-     <!--     <span class="s-sprite-icon">⚡</span> -->
-        <span class="s-sprite-name">SD Animated 3D</span> 
-        <span class="s-sprite-desc">Smooth standard Pokémon animations</span> <!-- From Pokemon Sun and Moon Gen 7-->
-        <span class="s-sprite-tick">✓ Selected</span>
-      </div>
-      <div class="s-sprite-btn" data-style="static" onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-      <!--    <span class="s-sprite-icon">🕹️</span>-->
-        <span class="s-sprite-name">Static 2D</span>
-        <span class="s-sprite-desc">Classic Pokémon art</span> <!-- From Pokemon Official Art -->
-        <span class="s-sprite-tick">✓ Selected</span>
+    <!-- ── Easter Egg Overlay ── -->
+    <!-- Easter Egg Overlay -->
+    <div
+      id="easter-overlay"
+      style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.82); align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:32px; font-family:Flexo,sans-serif; color:#fff;"
+    >
+      <div id="easter-card" style="position:relative; display:flex; flex-direction:column; align-items:center;">
+        <div id="easter-emoji" style="font-size:64px; margin-bottom:16px;"></div>
+        <div id="easter-title" style="font-size:22px; font-weight:700; margin-bottom:10px; color:#FFCB05;"></div>
+        <div id="easter-body" style="font-size:14px; line-height:1.7; color:#eee; max-width:320px;"></div>
+        <button
+          id="easter-close"
+          onclick="closeEasterEgg()"
+          style="margin-top:28px; background:#FFCB05; color:#003A70; border:none; border-radius:10px; padding:12px 28px; font-size:14px; font-weight:700; cursor:pointer; font-family:Flexo,sans-serif;"
+        >
+          Got it!
+        </button>
       </div>
     </div>
 
-    <div class="s-label">Animation</div>
-    <div class="s-animation-grid" id="s-animation-grid">
-      <div class="s-animation-btn selected" data-mode="beautiful" onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-        <span class="s-animation-name">Beautiful</span>
-        <span class="s-animation-desc">Smooth animation and transitions between questions.</span>
-        <span class="s-animation-tick">Selected</span>
+    <button class="gear-toggle" id="gear-toggle" onclick="playClick(); openSettings()" title="Settings">⚙️</button>
+
+    <div class="card">
+      <!-- ══════════ LANDING ══════════ -->
+      <div id="landing-screen" class="screen">
+        <img src="img/pokemommy_logo.png" alt="PokeMommy" class="landing-logo" id="landing-logo" />
+        <p class="landing-subtitle">Gotta train 'em all</p>
+
+        <div class="quiz-type-grid">
+          <button class="quiz-type-btn" onclick="openLearn()">
+            <span class="qt-icon"><img class="qt-svg-img" src="img/pokedex.svg" /></span>
+            <span class="qt-text">
+              <span class="qt-title">Pokédex</span>
+              <span class="qt-desc">Browse every Pokémon, explore types, Pokédex entries, and evolution chains.</span>
+            </span>
+            <span class="qt-arrow">›</span>
+          </button>
+          <button class="quiz-type-btn" onclick="goToWelcome('identify')">
+            <span class="qt-icon"><img class="qt-svg-img" src="img/identify.svg" /></span>
+            <span class="qt-text">
+              <span class="qt-title">Identify the Pokémon</span>
+              <span class="qt-desc">A Pokémon name appears; pick the correct image from four options given.</span>
+            </span>
+            <span class="qt-arrow">›</span>
+          </button>
+          <button class="quiz-type-btn" onclick="goToWelcome('evo')">
+            <span class="qt-icon"><img class="qt-svg-img" src="img/evolution.svg" /></span>
+            <span class="qt-text">
+              <span class="qt-title">Spot the Evolution</span>
+              <span class="qt-desc">A Pokémon is shown; choose its evolution or pre-evolution from options.</span>
+            </span>
+            <span class="qt-arrow">›</span>
+          </button>
+          <button class="quiz-type-btn" onclick="goToWelcome('whos')">
+            <span class="qt-icon"><img class="qt-svg-img" src="img/who_pokemon.svg" /></span>
+            <span class="qt-text">
+              <span class="qt-title">Who's That Pokémon?</span>
+              <span class="qt-desc">A Pokémon appears; select the correct name from the four given options.</span>
+            </span>
+            <span class="qt-arrow">›</span>
+          </button>
+
+          <!-- ── Coming Soon Divider ─────────────────────────────────── -->
+          <div class="quiz-section-divider">
+            <span>The Road Ahead</span>
+          </div>
+
+          <!-- ── Gym Battles (Coming Soon) ──────────────────────────── -->
+          <button class="quiz-type-btn" id="gym-battles-btn" onclick="gymBattleTap()" title="Gym Battles">
+            <span class="qt-icon"><img class="qt-svg-img" src="img/gym_trainer.svg" /></span>
+            <span class="qt-text">
+              <span class="qt-title"
+                >Gym Battles<span class="qt-coming-soon-badge" id="gym-coming-soon-badge" style="display:none"
+                  >Coming Soon</span
+                ></span
+              >
+              <span class="qt-desc">Earn badges by mastering Pokémon and their unique types and specialties.</span>
+            </span>
+            <span class="qt-arrow">›</span>
+          </button>
+        </div>
       </div>
-      <div class="s-animation-btn" data-mode="fast" onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
-        <span class="s-animation-name">Fast</span>
-        <span class="s-animation-desc">No transitions or animations for speed-focused runs.</span>
-        <span class="s-animation-tick">Selected</span>
+
+      <!-- ══════════ WELCOME ══════════ -->
+      <div id="welcome-screen" class="screen">
+        <button class="back-link" onclick="goHome()">‹ Back</button>
+        <h1 id="welcome-title">Who's That Pokémon?</h1>
+        <input type="hidden" id="player-name" placeholder="Brock / Misty" maxlength="20" />
+        <label>Quiz Mode</label>
+        <div class="toggle-row">
+          <button class="toggle-btn active" id="btn-quick" onclick="selectMode('quick')">
+            Quick Test<br /><span style="font-size:11px;font-weight:400;">20 Questions</span>
+          </button>
+          <button class="toggle-btn" id="btn-full" onclick="selectMode('full')">
+            Full Pokédex<br /><span style="font-size:11px;font-weight:400;">All 151</span>
+          </button>
+        </div>
+        <label>Difficulty</label>
+        <div class="difficulty-row">
+          <button class="diff-btn" id="btn-easy" onclick="selectDiff('easy')">
+            <span class="icon">🌟</span>Easy <br /><small style="font-weight:400;font-size:11px" id="easy-desc"
+              >Full sprite shown</small
+            >
+          </button>
+          <button class="diff-btn" id="btn-hard" onclick="selectDiff('hard')">
+            <span class="icon">🌑</span>Hard <br /><small style="font-weight:400;font-size:11px" id="hard-desc"
+              >Silhouette only</small
+            >
+          </button>
+        </div>
+        <button class="start-btn" id="start-btn" onclick="startGame()" disabled>Start Quiz!</button>
+      </div>
+
+      <!-- ══════════ GAME ══════════ -->
+      <div id="game-screen" class="screen">
+        <div class="top-bar">
+          <div class="top-row-1">
+            <button class="topbar-back-btn" onclick="confirmGoHome()" title="Quit quiz">&#8592; Quit</button>
+            <button class="reset-btn" onclick="confirmReset()">&#8635; Reset</button>
+          </div>
+          <div class="top-row-2">
+            <div class="top-trainer">
+              <img
+                id="trainer-gender-img"
+                src="img/boy_ow.png"
+                style="width:22px;height:22px;object-fit:contain;image-rendering:pixelated"
+              />
+              <span class="trainer" id="player-display"></span>
+            </div>
+            <span class="q-counter">Q<span id="q-num">1</span>/<span id="q-total">20</span></span>
+            <span class="acc-inline">Acc <span id="accuracy-display">—</span></span>
+            <span class="timer-display" id="timer-display">0m 00s</span>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+
+        <!-- WHO'S THAT -->
+        <div id="whos-section">
+          <div class="pokemon-img-wrap">
+            <div class="img-skeleton" id="whos-skeleton"></div>
+            <div class="spinner" id="spinner"></div>
+            <img id="pokemon-img" src="" alt="Who's that Pokémon?" />
+          </div>
+          <p class="question-label">Who's that Pokémon?</p>
+          <div class="options-grid" id="options-grid"></div>
+        </div>
+
+        <!-- IDENTIFY -->
+        <div id="identify-section">
+          <p class="question-label" style="margin-bottom:6px;">Which one is…</p>
+          <div class="identify-name" id="identify-name"></div>
+          <div class="img-options-grid" id="img-options-grid"></div>
+        </div>
+
+        <!-- EVOLUTION -->
+        <div id="evo-section">
+          <div class="evo-visual-row" id="evo-visual-row"></div>
+          <div class="evo-question-img-wrap" id="evo-question-img-wrap">
+            <div class="img-skeleton" id="evo-skeleton"></div>
+            <div class="evo-spinner" id="evo-spinner"></div>
+            <img id="evo-pokemon-img" src="" alt="" />
+          </div>
+          <div class="evo-options-grid" id="evo-options-grid"></div>
+        </div>
+
+        <p class="feedback-msg" id="feedback-msg"></p>
+        <div class="hint-section">
+          <div class="hint-row">
+            <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)">
+              <span class="hint-icon">🏷️</span>Hint 1
+            </button>
+            <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)" disabled>
+              <span class="hint-icon">⚡</span>Hint 2
+            </button>
+            <button class="hint-btn" id="hint-btn-3" onclick="revealHint(3)" disabled>
+              <span class="hint-icon">📖</span>Hint 3
+            </button>
+          </div>
+          <div class="hint-cards" id="hint-cards"></div>
+        </div>
+        <button class="next-btn" id="next-btn" style="display:none" onclick="nextQuestion()">Next →</button>
+      </div>
+
+      <!-- ══════════ RESULTS ══════════ -->
+      <div id="result-screen" class="screen">
+        <div class="result-emoji" id="result-emoji">🏆</div>
+        <p class="result-name" id="result-player-name"></p>
+        <div class="result-pct" id="result-pct"></div>
+        <p class="result-sub" id="result-score-sub"></p>
+        <p class="result-time" id="result-time"></p>
+        <p class="result-msg" id="result-msg"></p>
+        <p class="lb-submit-status" id="lb-submit-status"></p>
+        <button class="restart-btn" onclick="restartGame()">Play Again</button>
+        <button class="leaderboard-btn" onclick="showLeaderboard()">Leaderboard</button>
+        <button class="share-btn" id="share-btn" onclick="shareScore()">Share Score</button>
+        <button class="home-btn" onclick="goHome()">Choose a Different Quiz</button>
+        <button
+          id="review-answers-btn"
+          onclick="showReviewScreen(true)"
+          style="display:none;width:100%;padding:12px;margin-top:8px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.25);border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:Flexo,sans-serif;"
+        >
+          Review Answers
+        </button>
+        <div id="review-section" style="display:none"></div>
+      </div>
+
+      <!-- REVIEW SCREEN -->
+      <div id="review-screen" class="screen" style="display:none;">
+        <button class="back-link" onclick="showReviewScreen(false)">← Back to Results</button>
+        <div
+          id="review-header-title"
+          style="font-family:Flexo,sans-serif;font-size:20px;font-weight:700;color:#003A70;margin-bottom:4px;"
+        >
+          Answer Review
+        </div>
+        <div
+          id="review-header-sub"
+          style="font-family:Roboto,sans-serif;font-size:13px;color:#888;margin-bottom:14px;"
+        ></div>
+        <div id="review-list" class="review-list-wrap"></div>
+      </div>
+
+      <!-- ══════════ LEADERBOARD ══════════ -->
+      <div id="leaderboard-screen" class="screen" style="display:none">
+        <button class="back-link" onclick="closeLeaderboard()">‹ Back to Results</button>
+        <h2 class="lb-title" id="lb-title">🏆 Leaderboard</h2>
+        <div id="lb-table-wrap" class="lb-table-wrap"></div>
+      </div>
+
+      <!-- ══════════ POKÉDEX — BROWSE ══════════ -->
+      <div id="learn-browse-screen" class="screen" style="display:none">
+        <button class="back-link" onclick="goHome()">‹ Back</button>
+        <h1 class="learn-browse-title">Pokédex</h1>
+        <input
+          type="text"
+          id="learn-search"
+          placeholder="Search Pokémon…"
+          oninput="filterLearnList()"
+          style="margin-bottom:20px;"
+        />
+        <div id="learn-grid" class="learn-grid"></div>
+      </div>
+
+      <!-- ══════════ POKÉDEX — DETAIL ══════════ -->
+      <div id="learn-detail-screen" class="screen" style="display:none">
+        <div class="learn-detail-topbar">
+          <button class="back-link" style="margin-bottom:0" onclick="learnGoBack()">‹ Back</button>
+          <span class="learn-detail-num" id="learn-detail-num">#001</span>
+        </div>
+        <div class="learn-nav-row">
+          <button class="learn-nav-btn" id="learn-nav-prev" onclick="learnNavigate(-1)">‹ Prev</button>
+          <button class="learn-nav-btn" id="learn-nav-next" onclick="learnNavigate(1)">Next ›</button>
+        </div>
+        <div class="swipe-hint" id="swipe-hint">‹ swipe to navigate ›</div>
+        <div class="learn-sprite-wrap">
+          <div class="spinner" id="learn-spinner"></div>
+          <img id="learn-sprite" src="" alt="" />
+        </div>
+        <div class="learn-name-row">
+          <span class="learn-detail-name" id="learn-detail-name">Bulbasaur</span>
+          <button
+            class="learn-speaker-btn"
+            id="learn-speaker-btn"
+            onclick="playLearnAudio()"
+            title="Hear pronunciation"
+          >
+            🔊
+          </button>
+        </div>
+        <div class="learn-info-grid">
+          <div class="learn-info-card">
+            <div class="learn-info-label">Category</div>
+            <div class="learn-info-value" id="learn-category">—</div>
+          </div>
+          <div class="learn-info-card">
+            <div class="learn-info-label">Type</div>
+            <div class="learn-info-value" id="learn-type">—</div>
+          </div>
+        </div>
+        <div class="learn-dex-entry" id="learn-dex-entry">Loading Pokédex entry…</div>
+        <div class="learn-evo-section">
+          <div class="learn-section-label">Evolution Chain</div>
+          <div class="learn-evo-line" id="learn-evo-line"></div>
+        </div>
+      </div>
+    </div>
+    <!-- /.card -->
+
+    <!-- Settings Overlay -->
+    <div id="settings-overlay" onclick="handleSettingsOverlayClick(event)">
+      <div class="s-sheet">
+        <div class="s-title-row">
+          <div class="s-title">Settings</div>
+          <button class="s-close-btn" onclick="closeSettings()" title="Close">✕</button>
+        </div>
+
+        <!-- Generation -->
+        <div class="s-label">Generation</div>
+        <div class="s-gen-chips">
+          <div class="s-gen-chip s-mandatory" onclick="showToast('You can\'t leave the Kanto region just yet!')">
+            <div class="s-chip-check">&#10003;</div>
+            Gen I · Kanto
+          </div>
+          <div
+            class="s-gen-chip s-locked"
+            onclick="showToast('This region is still locked. New Pokémon will appear soon!')"
+          >
+            <div class="s-chip-check"></div>
+            Gen II · Johto
+          </div>
+          <div
+            class="s-gen-chip s-locked"
+            onclick="showToast('This region is still locked. New Pokémon will appear soon!')"
+          >
+            <div class="s-chip-check"></div>
+            Gen III · Hoenn
+          </div>
+          <div
+            class="s-gen-chip s-locked"
+            onclick="showToast('This region is still locked. New Pokémon will appear soon!')"
+          >
+            <div class="s-chip-check"></div>
+            Gen IV · Sinnoh
+          </div>
+        </div>
+        <!--<div class="s-gen-note">ℹ️ These regions are still locked. New Pokémon will appear soon!</div>-->
+
+        <!-- Sound -->
+        <div class="s-label">Sound</div>
+        <div class="s-sound-row">
+          <div class="s-sound-card" id="s-sfx-card">
+            <div class="s-sound-lbl">Sound Effects <span class="s-sound-val" id="s-sfx-val">70%</span></div>
+            <input
+              type="range"
+              id="s-sfx-slider"
+              min="0"
+              max="100"
+              value="70"
+              style="--pct:70%"
+              oninput="onSettingsSlider('sfx', this.value)"
+            />
+          </div>
+          <div class="s-sound-card" id="s-music-card">
+            <div class="s-sound-lbl">Background Music <span class="s-sound-val" id="s-music-val">50%</span></div>
+            <input
+              type="range"
+              id="s-music-slider"
+              min="0"
+              max="100"
+              value="50"
+              style="--pct:50%"
+              oninput="onSettingsSlider('music', this.value)"
+            />
+          </div>
+        </div>
+        <div class="s-duck-row">
+          <label class="s-duck-label" id="s-duck-row" for="s-auto-duck">Auto-dim background music during quiz</label>
+          <label class="s-toggle-switch">
+            <input type="checkbox" id="s-auto-duck" checked />
+            <div class="s-toggle-track"></div>
+          </label>
+        </div>
+
+        <!-- Visual Style -->
+        <div class="s-label">Visual Style</div>
+        <div class="s-sprite-grid" id="s-sprite-grid">
+          <div
+            class="s-sprite-btn"
+            data-style="hd"
+            onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"
+          >
+            <!--     <span class="s-sprite-icon">✨</span> -->
+            <span class="s-sprite-name">HD Animated 3D</span>
+            <span class="s-sprite-desc">Lively high-def Pokémon animations</span>
+            <span class="s-sprite-tick">✓ Selected</span>
+          </div>
+          <div
+            class="s-sprite-btn selected"
+            data-style="sd"
+            onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"
+          >
+            <!--     <span class="s-sprite-icon">⚡</span> -->
+            <span class="s-sprite-name">SD Animated 3D</span>
+            <span class="s-sprite-desc">Smooth standard Pokémon animations</span>
+            <!-- From Pokemon Sun and Moon Gen 7-->
+            <span class="s-sprite-tick">✓ Selected</span>
+          </div>
+          <div
+            class="s-sprite-btn"
+            data-style="static"
+            onclick="this.closest('.s-sprite-grid').querySelectorAll('.s-sprite-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"
+          >
+            <!--    <span class="s-sprite-icon">🕹️</span>-->
+            <span class="s-sprite-name">Static 2D</span>
+            <span class="s-sprite-desc">Classic Pokémon art</span>
+            <!-- From Pokemon Official Art -->
+            <span class="s-sprite-tick">✓ Selected</span>
+          </div>
+        </div>
+
+        <div class="s-label">Animation</div>
+        <div class="s-animation-grid" id="s-animation-grid">
+          <div
+            class="s-animation-btn selected"
+            data-mode="beautiful"
+            onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"
+          >
+            <span class="s-animation-name">Beautiful</span>
+            <span class="s-animation-desc">Smooth animation and transitions between questions.</span>
+            <span class="s-animation-tick">Selected</span>
+          </div>
+          <div
+            class="s-animation-btn"
+            data-mode="fast"
+            onclick="this.closest('.s-animation-grid').querySelectorAll('.s-animation-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')"
+          >
+            <span class="s-animation-name">Fast</span>
+            <span class="s-animation-desc">No transitions or animations for speed-focused runs.</span>
+            <span class="s-animation-tick">Selected</span>
+          </div>
+        </div>
+
+        <button class="s-save-btn" onclick="saveSettings()">Save & Close</button>
       </div>
     </div>
 
-    <button class="s-save-btn" onclick="saveSettings()">Save & Close</button>
-  </div>
-</div>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+      <symbol id="footer-pokeball-icon" viewBox="0 0 59 59">
+        <path
+          d="M29.0059 1C44.4588 1 57.0115 13.3439 57.0117 28.6025C57.0117 43.8613 44.4589 56.2061 29.0059 56.2061C13.5529 56.206 1 43.8613 1 28.6025C1.0002 13.344 13.553 1.00007 29.0059 1Z"
+          fill="black"
+          stroke="var(--pokeball-outline,#fff)"
+          stroke-width="2"
+        />
+        <path
+          d="M51.0418 31.894C52.8895 19.9015 44.5182 8.70411 32.3439 6.88399C20.1697 5.06386 8.80264 13.3102 6.95494 25.3028C5.10723 37.2953 13.4786 48.4927 25.6528 50.3128C37.8271 52.133 49.1941 43.8866 51.0418 31.894Z"
+          fill="black"
+        />
+        <path
+          d="M35.6968 29.6001C36.2583 25.9556 33.7143 22.5527 30.0145 21.9996C26.3148 21.4465 22.8604 23.9525 22.2989 27.597C21.7374 31.2415 24.2814 34.6443 27.9811 35.1975C31.6808 35.7506 35.1352 33.2445 35.6968 29.6001Z"
+          fill="white"
+        />
+        <path
+          d="M21.3809 20.8541C24.8652 17.5073 30.2799 16.6992 34.6522 19.2663C39.0342 21.8429 40.8777 26.9201 39.5458 31.5314L49.4872 37.3787C53.9367 27.3289 50.3076 15.3776 40.4916 9.61582C30.6853 3.85408 18.2923 6.38316 11.4395 15.0068L21.3809 20.8541Z"
+          fill="#CB3233"
+        />
+        <path
+          d="M36.641 36.3614C33.147 39.6987 27.7323 40.5068 23.3503 37.9397C18.9684 35.3631 17.1152 30.2859 18.4375 25.6651L8.53466 19.8463C4.0948 29.8961 7.69495 41.8284 17.5013 47.5902C27.3076 53.3424 39.6717 50.7943 46.5342 42.1802L36.6313 36.3614H36.641Z"
+          fill="white"
+        />
+      </symbol>
+    </svg>
 
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-  <symbol id="footer-pokeball-icon" viewBox="0 0 59 59">
-    <path d="M29.0059 1C44.4588 1 57.0115 13.3439 57.0117 28.6025C57.0117 43.8613 44.4589 56.2061 29.0059 56.2061C13.5529 56.206 1 43.8613 1 28.6025C1.0002 13.344 13.553 1.00007 29.0059 1Z" fill="black" stroke="var(--pokeball-outline,#fff)" stroke-width="2"/>
-    <path d="M51.0418 31.894C52.8895 19.9015 44.5182 8.70411 32.3439 6.88399C20.1697 5.06386 8.80264 13.3102 6.95494 25.3028C5.10723 37.2953 13.4786 48.4927 25.6528 50.3128C37.8271 52.133 49.1941 43.8866 51.0418 31.894Z" fill="black"/>
-    <path d="M35.6968 29.6001C36.2583 25.9556 33.7143 22.5527 30.0145 21.9996C26.3148 21.4465 22.8604 23.9525 22.2989 27.597C21.7374 31.2415 24.2814 34.6443 27.9811 35.1975C31.6808 35.7506 35.1352 33.2445 35.6968 29.6001Z" fill="white"/>
-    <path d="M21.3809 20.8541C24.8652 17.5073 30.2799 16.6992 34.6522 19.2663C39.0342 21.8429 40.8777 26.9201 39.5458 31.5314L49.4872 37.3787C53.9367 27.3289 50.3076 15.3776 40.4916 9.61582C30.6853 3.85408 18.2923 6.38316 11.4395 15.0068L21.3809 20.8541Z" fill="#CB3233"/>
-    <path d="M36.641 36.3614C33.147 39.6987 27.7323 40.5068 23.3503 37.9397C18.9684 35.3631 17.1152 30.2859 18.4375 25.6651L8.53466 19.8463C4.0948 29.8961 7.69495 41.8284 17.5013 47.5902C27.3076 53.3424 39.6717 50.7943 46.5342 42.1802L36.6313 36.3614H36.641Z" fill="white"/>
-  </symbol>
-</svg>
-
-<footer class="page-footer">
-<!--            z...........                                                                          
+    <footer class="page-footer">
+      <!--            z...........                                                                          
               ...:*+-..........                                                    ...............  
               ...*@@@@@@@%+:........                                       .........................
               ...-@@@@@@@@@@@@@+:.......                             ...........:=*%@@@@@@@@@@@@:...
@@ -488,41 +647,47 @@
                                                  ....#-:+.=%....                                    
                                                   .....-+*-....                                     
                                                     ..........-->
-  
-  <div class="footer-dedication-badge" role="button" tabindex="0"
-     aria-label="Created by MaulishMaster, for my wife and our little future Pokémon Trainer she's carrying."
-     onclick="triggerDedicationEgg()"
-     onkeydown="if(event.key==='Enter'||event.key===' ')triggerDedicationEgg()">
-  <div class="footer-dedication-ball" aria-hidden="true">
-    <svg viewBox="0 0 59 59" aria-hidden="true">
-      <use href="#footer-pokeball-icon"></use>
-    </svg>
-  </div>
-  <span class="footer-dedication-text">Created by MaulishMaster, for my wife and<br>our little future Pokémon Trainer she's carrying.</span>
-</div>
-  <div class="disclaimer">
-    Pokémon and all respective names are trademarks and © of Nintendo, Game Freak, and Creatures Inc.<br/>
-    This is a non-commercial fan project and is not affiliated with or endorsed by The Pokémon Company.
-  </div>
-</footer>
 
-<script src="js/audio.js"></script>
-<script src="js/quiz.js"></script>
-<script src="js/leaderboard.js"></script>
-<script src="js/scorecard.js"></script>
-<script>
-  (function () {
-    const badge = document.querySelector('.footer-dedication-badge');
-    if (!badge) return;
+      <div
+        class="footer-dedication-badge"
+        role="button"
+        tabindex="0"
+        aria-label="Created by MaulishMaster, for my wife and our little future Pokémon Trainer she's carrying."
+        onclick="triggerDedicationEgg()"
+        onkeydown="if(event.key==='Enter'||event.key===' ')triggerDedicationEgg()"
+      >
+        <div class="footer-dedication-ball" aria-hidden="true">
+          <svg viewBox="0 0 59 59" aria-hidden="true">
+            <use href="#footer-pokeball-icon"></use>
+          </svg>
+        </div>
+        <span class="footer-dedication-text"
+          >Created by MaulishMaster, for my wife and<br />our little future Pokémon Trainer she's carrying.</span
+        >
+      </div>
+      <div class="disclaimer">
+        Pokémon and all respective names are trademarks and © of Nintendo, Game Freak, and Creatures Inc.<br />
+        This is a non-commercial fan project and is not affiliated with or endorsed by The Pokémon Company.
+      </div>
+    </footer>
 
-    const triggerSpin = () => {
-      badge.classList.remove('is-spinning');
-      void badge.offsetWidth;
-      badge.classList.add('is-spinning');
-    };
+    <script src="js/audio.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/scorecard.js"></script>
+    <script>
+      (function () {
+        const badge = document.querySelector('.footer-dedication-badge');
+        if (!badge) return;
 
-    badge.addEventListener('click', triggerSpin);
-  }());
-</script>
-</body>
+        const triggerSpin = () => {
+          badge.classList.remove('is-spinning');
+          void badge.offsetWidth;
+          badge.classList.add('is-spinning');
+        };
+
+        badge.addEventListener('click', triggerSpin);
+      }());
+    </script>
+  </body>
 </html>

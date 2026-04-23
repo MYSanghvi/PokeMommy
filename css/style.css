@@ -491,9 +491,7 @@ body:has(#result-screen[style*="block"]) {
   overflow-x: auto;
   width: 100%;
 }
-.lb-table-wrap::-webkit-scrollbar { width: 6px; }
-.lb-table-wrap::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 99px; }
-.lb-table-wrap::-webkit-scrollbar-thumb { background: #3D7DCA; border-radius: 99px; }
+
 .lb-table { width: 100%; border-collapse: collapse; font-family: 'Roboto', sans-serif; font-size: 12px; }
 .lb-table th {
   font-family: 'Roboto', sans-serif; font-size: 10px; font-weight: 700; color: #aaa;
@@ -615,9 +613,7 @@ body:has(#result-screen[style*="block"]) {
   display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
   max-height: 480px; overflow-y: auto; padding-right: 4px; margin-top: 6px;
 }
-.learn-grid::-webkit-scrollbar { width: 6px; }
-.learn-grid::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 99px; }
-.learn-grid::-webkit-scrollbar-thumb { background: #3D7DCA; border-radius: 99px; }
+
 .learn-card {
   border: 2px solid #eee; border-radius: 12px; background: #f9f9f9;
   cursor: pointer; padding: 10px 6px 8px; transition: all .2s; margin-top: 5px;
@@ -1432,7 +1428,7 @@ easter-overlay.dedication-active {
   text-transform: uppercase;
 }
 
-body.night-mode .quiz-section-divider { color: #444; }
+body.night-mode .quiz-section-divider { color: #fff; }
 body.night-mode .quiz-section-divider::before,
 body.night-mode .quiz-section-divider::after { background: #2a3a5a; }
 body.night-mode .qt-coming-soon-badge {
@@ -1979,8 +1975,95 @@ body.night-mode .review-img-wrap {
 body.night-mode .review-question { color: #aab4c8; }
 body.night-mode .review-correct  { color: #6daa45; }
 body.night-mode .review-wrong    { color: #dd6974; }
+
+/* REVIEW SCREEN */
+.review-list-wrap {
+  max-height: 55vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+body.night-mode #review-header-title { color: #7eb3f7 !important; }
+body.night-mode #review-header-sub   { color: #556a8a !important; }
+body.night-mode .review-list-wrap::-webkit-scrollbar-track { background: #1e2d4a; }
+
+.review-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+.review-card--correct {
+  background: rgba(40,167,69,0.10);
+  border: 1.5px solid rgba(40,167,69,0.35);
+}
+.review-card--wrong {
+  background: rgba(220,53,69,0.12);
+  border: 1.5px solid rgba(220,53,69,0.40);
+}
+
+body.night-mode .review-card--correct {
+  background: rgba(40,167,69,0.12) !important;
+  border-color: rgba(109,170,69,0.45) !important;
+}
+body.night-mode .review-card--wrong {
+  background: rgba(220,53,69,0.14) !important;
+  border-color: rgba(221,105,116,0.45) !important;
+}
+
+
 /* ── REVIEW MISTAKES END ────────────────────────────────────── */
 
+/* ── UNIFIED SCROLLBAR ─────────────────────────────── */
+.learn-grid,
+.lb-table-wrap,
+.review-list-wrap {
+    overscroll-behavior: contain; /* prevents pull-to-refresh on mobile */
+    -webkit-overflow-scrolling: touch; /* smooth momentum scroll on iOS */
+}
+
+.learn-grid::-webkit-scrollbar,
+.lb-table-wrap::-webkit-scrollbar,
+.review-list-wrap::-webkit-scrollbar {
+    width: 4px;
+}
+.learn-grid::-webkit-scrollbar-track,
+.lb-table-wrap::-webkit-scrollbar-track,
+.review-list-wrap::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 99px;
+}
+.learn-grid::-webkit-scrollbar-thumb,
+.lb-table-wrap::-webkit-scrollbar-thumb,
+.review-list-wrap::-webkit-scrollbar-thumb {
+    background: rgba(61, 125, 202, 0.35);
+    border-radius: 99px;
+    transition: background 0.2s;
+}
+.learn-grid:hover::-webkit-scrollbar-thumb,
+.lb-table-wrap:hover::-webkit-scrollbar-thumb,
+.review-list-wrap:hover::-webkit-scrollbar-thumb {
+    background: rgba(61, 125, 202, 0.65);
+}
+
+/* Dark mode scrollbar */
+body.night-mode .learn-grid::-webkit-scrollbar-thumb,
+body.night-mode .lb-table-wrap::-webkit-scrollbar-thumb,
+body.night-mode .review-list-wrap::-webkit-scrollbar-thumb {
+    background: rgba(126, 179, 247, 0.3);
+}
+body.night-mode .learn-grid:hover::-webkit-scrollbar-thumb,
+body.night-mode .lb-table-wrap:hover::-webkit-scrollbar-thumb,
+body.night-mode .review-list-wrap:hover::-webkit-scrollbar-thumb {
+    background: rgba(126, 179, 247, 0.6);
+}
+/* ── END UNIFIED SCROLLBAR ─────────────────────────── */
 
 /* ── Keyboard shortcut badges on answer buttons ──────────────── */
 #options-grid .opt-btn,
